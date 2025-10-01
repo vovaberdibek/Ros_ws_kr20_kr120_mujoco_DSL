@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="kr20_kr120">
+  <compiler angle="radian" />
+
+  <asset>
+    <mesh name="kr20_basement" file="kr20_basement.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_base" file="kr20_base.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_asse1" file="kr20_asse1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_asse2" file="kr20_asse2.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_asse3" file="kr20_asse3.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_asse4" file="kr20_asse4.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_asse5" file="kr20_asse5.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_flange" file="kr20_flange.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_polso" file="kr20_polso.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_fixed" file="kr20_fixed.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr20_slide" file="kr20_slide.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_basement" file="kr120_basement.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_base" file="kr120_base.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_asse1" file="kr120_asse1.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_asse2" file="kr120_asse2.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_asse3" file="kr120_asse3.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_asse4" file="kr120_asse4.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_asse5" file="kr120_asse5.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_flange" file="kr120_flange.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_slider" file="kr120_slider.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_pinza_left" file="kr120_pinza_left.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_pinza_right" file="kr120_pinza_right.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_gyro_left" file="kr120_gyro_left.stl" scale="0.001 0.001 0.001" />
+    <mesh name="kr120_gyro_right" file="kr120_gyro_right.stl" scale="0.001 0.001 0.001" />
+    <mesh name="pareti" file="pareti.stl" scale="0.001 0.001 0.001" />
+    <mesh name="rl_infrastruttura" file="rl_infrastruttura.stl" scale="0.001 0.001 0.001" />
+    <mesh name="rl_piastra" file="rl_piastra.stl" scale="0.001 0.001 0.001" />
+    <mesh name="rl_lifter" file="rl_lifter.stl" scale="0.001 0.001 0.001" />
+  </asset>
+
+  <worldbody>
+    <geom pos="-0.367501 -0.164999 0" quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="kr20_basement" />
+    <geom pos="0 0 0.551" quat="0.707105 0 0 -0.707108" type="mesh" mesh="kr20_base" />
+    <geom pos="3.5475 -2.69499 0" quat="0.499998 -0.5 -0.500002 0.5" type="mesh" mesh="kr120_basement" />
+    <geom pos="1.59 -1.43 0.529" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_base" />
+    <geom pos="-0.0485 -0.5405 0" quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="pareti" />
+    <geom size="0.625 0.6 0.409" pos="1.252 -0.12 0.413" type="box" />
+    <geom size="0.02 0.075 0.005" pos="1.35133 0.293226 1.10162" type="box" />
+    <geom size="0.02 0.075 0.005" pos="1.35133 -0.025761 1.10162" type="box" />
+    <geom size="0.02 0.075 0.005" pos="0.672197 -0.025761 1.10162" type="box" />
+    <geom size="0.02 0.075 0.005" pos="0.672197 0.293226 1.10162" type="box" />
+    <geom pos="0.096703 -1.43 0.66625" quat="0.707105 0 0 0.707108" type="mesh" mesh="rl_infrastruttura" />
+    <body name="kr20_link1" quat="0.707105 0 0 -0.707108">
+      <inertial pos="0 0 0.551" mass="1.5" diaginertia="0.054147 0.054147 0.001875" />
+      <joint name="kr20_base_link__link1" pos="0 0 0" axis="0 0 1" range="-3.22886 3.22886" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+      <geom pos="0 0 0.551" quat="1 0 0 0" type="mesh" mesh="kr20_asse1" />
+      <body name="kr20_link2" pos="0.16 0 1.071">
+        <inertial pos="-0.16 0 -0.52" mass="2" diaginertia="8e-05 8e-05 8e-05" />
+        <joint name="kr20_link1__link2" pos="0 0 0" axis="0 1 0" range="-1.65806 2.70526" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+        <geom pos="-0.16 0 -0.52" quat="1 0 0 0" type="mesh" mesh="kr20_asse2" />
+        <body name="kr20_link3" pos="0 0 0.78">
+          <inertial pos="-0.16 0 -1.3" mass="2" diaginertia="8e-05 8e-05 8e-05" />
+          <joint name="kr20_link2__link3" pos="0 0 0" axis="0 1 0" range="-3.97935 1.48353" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+          <geom pos="-0.16 0 -1.3" quat="1 0 0 0" type="mesh" mesh="kr20_asse3" />
+          <body name="kr20_link4" pos="0.233 0 0.15">
+            <inertial pos="-0.393 0 -1.45" mass="1" diaginertia="4e-05 4e-05 4e-05" />
+            <joint name="kr20_link3__link4" pos="0 0 0" axis="1 0 0" range="-6.10865 6.10865" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+            <geom pos="-0.393 0 -1.45" quat="1 0 0 0" type="mesh" mesh="kr20_asse4" />
+            <body name="kr20_link5" pos="0.627 0 0">
+              <inertial pos="-1.02 0 -1.45" mass="2" diaginertia="8e-05 8e-05 8e-05" />
+              <joint name="kr20_link4__link5" pos="0 0 0" axis="0 1 0" range="-2.26893 2.26893" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+              <geom pos="-1.02 0 -1.45" quat="1 0 0 0" type="mesh" mesh="kr20_asse5" />
+              <body name="kr20_flange" pos="0.153 0 0">
+                <inertial pos="-0.354167 0 -0.483333" quat="0.658561 0.257483 0.257483 0.658561" mass="3" diaginertia="2.69612 2.69541 0.100796" />
+                <joint name="kr20_link5__flange" pos="0 0 0" axis="1 0 0" range="-6.10865 6.10865" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+                <geom pos="-1.246 0 -1.45" quat="1 0 0 0" type="mesh" mesh="kr20_flange" />
+                <geom pos="0.066 0 0" quat="0.499998 -0.500002 0.5 0.5" type="mesh" mesh="kr20_polso" />
+                <geom pos="0.1175 0 0" quat="0.707108 -0.707105 6.5516e-05 -1.20327e-10" type="mesh" mesh="kr20_fixed" />
+                <body name="kr20_slide" pos="0.299605 0 -0.252354">
+                  <inertial pos="-0.09159 0 0.252354" mass="1" diaginertia="0.1 0.1 0.1" />
+                  <joint name="kr20_fixed_slide_joint" pos="0 0 0" axis="0 0 1" type="slide" range="-0.05121 0.013863" actuatorfrcrange="-100 100" damping="20.0" frictionloss="10" />
+                  <geom pos="-0.09159 0 0.252354" quat="0.499998 -0.5 -0.5 -0.500002" type="mesh" mesh="kr20_slide" />
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="kr120_link1" pos="1.59 -1.43 0" quat="0.707105 0 0 0.707108">
+      <inertial pos="0 0 0.529" mass="1.5" diaginertia="0.054147 0.054147 0.001875" />
+      <joint name="kr120_base_link__link1" pos="0 0 0" axis="0 0 1" range="-3.22886 3.22886" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+      <geom pos="0 0 0.529" quat="1 0 0 0" type="mesh" mesh="kr120_asse1" />
+      <body name="kr120_link2" pos="0.33 0 1.174">
+        <inertial pos="-0.33 0 -0.645" mass="2" diaginertia="8e-05 8e-05 8e-05" />
+        <joint name="kr120_link1__link2" pos="0 0 0" axis="0 1 0" range="-0.872665 1.48353" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+        <geom pos="-0.33 0 -0.645" quat="1 0 0 0" type="mesh" mesh="kr120_asse2" />
+        <body name="kr120_link3" pos="0 0 1.15">
+          <inertial pos="-0.33 0 -1.795" mass="2" diaginertia="8e-05 8e-05 8e-05" />
+          <joint name="kr120_link2__link3" pos="0 0 0" axis="0 1 0" range="-3.66519 1.27409" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+          <geom pos="-0.33 0 -1.795" quat="1 0 0 0" type="mesh" mesh="kr120_asse3" />
+          <body name="kr120_link4" pos="0.367 0 0.115">
+            <inertial pos="-0.697 0 -1.91" mass="1" diaginertia="4e-05 4e-05 4e-05" />
+            <joint name="kr120_link3__link4" pos="0 0 0" axis="1 0 0" range="-6.10865 6.10865" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+            <geom pos="-0.697 0 -1.91" quat="1 0 0 0" type="mesh" mesh="kr120_asse4" />
+            <body name="kr120_link5" pos="0.853 0 0">
+              <inertial pos="-1.55 0 -1.91" mass="2" diaginertia="8e-05 8e-05 8e-05" />
+              <joint name="kr120_link4__link5" pos="0 0 0" axis="0 1 0" range="-2.18166 2.18166" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+              <geom pos="-1.55 0 -1.91" quat="1 0 0 0" type="mesh" mesh="kr120_asse5" />
+              <body name="kr120_flange" pos="0.215 0 0">
+                <inertial pos="-0.8825 0 -0.955" quat="0.931245 0 0.364393 0" mass="2" diaginertia="3.4817 3.4817 0.10004" />
+                <joint name="kr120_link5__flange" pos="0 0 0" axis="1 0 0" range="-6.10865 6.10865" actuatorfrcrange="-100 100" damping="40" frictionloss="10" />
+                <geom pos="-1.765 0 -1.91" quat="1 0 0 0" type="mesh" mesh="kr120_flange" />
+                <geom pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_slider" />
+                <body name="kr120_pinza_left">
+                  <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+                  <joint name="kr120_pinza_left_joint" pos="0 0 0" axis="0 1 0" type="slide" range="0 0.0355" actuatorfrcrange="-500 500" damping="20.0" />
+                  <geom pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_left" />
+                  <body name="kr120_gyro_left" pos="0.597 0 0">
+                    <inertial pos="-0.597 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+                    <joint name="kr120_gyro_left_joint" pos="0 0 0" axis="0 1 0" range="-3.1415 3.1415" actuatorfrcrange="-1000 1000" />
+                    <geom pos="-0.597 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_gyro_left" />
+                  </body>
+                </body>
+                <body name="kr120_pinza_right">
+                  <inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+                  <joint name="kr120_pinza_right_joint" pos="0 0 0" axis="0 1 0" type="slide" range="-0.0355 0" actuatorfrcrange="-500 500" damping="20.0" />
+                  <geom pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_right" />
+                  <body name="kr120_gyro_right" pos="0.597 0 0">
+                    <inertial pos="-0.597 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+                    <joint name="kr120_gyro_right_joint" pos="0 0 0" axis="0 -1 0" range="-3.1415 3.1415" actuatorfrcrange="-1000 1000" />
+                    <geom pos="-0.597 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_gyro_right" />
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="rl_lifter" pos="0 -1.43 0.01">
+      <inertial pos="-0.3455 0 -0.02" mass="100" diaginertia="0.004 0.004 0.004" />
+      <joint name="rl_base__lifter" pos="0 0 0" axis="0 0 1" type="slide" range="0 0.24" actuatorfrcrange="-100 100" damping="20.0" />
+      <geom pos="-0.3455 0 -0.02" quat="0.499998 0.5 0.500002 0.5" type="mesh" mesh="rl_lifter" />
+    </body>
+    <body name="rl_slider" pos="0 -1.43 0.01">
+      <inertial pos="0 0 0.473" mass="100" diaginertia="0.004 0.004 0.004" />
+      <joint name="rl_base__slider" pos="0 0 0" axis="1 0 0" type="slide" range="-1.031 0" actuatorfrcrange="-100 100" damping="20.0" />
+      <geom size="5e-05 5e-05 5e-05" pos="0 0 0.473" type="box" />
+      <body name="rl_plate">
+        <inertial pos="0 0 0.473" mass="100" diaginertia="0.004 0.004 0.004" />
+        <joint name="rl_slider__plate" pos="0 0 0" axis="0 0 1" range="0 6.28319" actuatorfrcrange="-100 100" />
+        <geom pos="0 0 0.473" quat="1 0 0 0" type="mesh" mesh="rl_piastra" />
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

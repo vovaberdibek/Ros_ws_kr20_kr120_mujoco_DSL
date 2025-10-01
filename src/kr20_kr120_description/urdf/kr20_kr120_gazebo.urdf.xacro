@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kr20_kr120_gz">
+
+  <!-- Bring in the full cell (no ros2_control here yet) -->
+  <xacro:include filename="$(find kr20_kr120_description)/urdf/kr20_kr120.urdf.xacro"/>
+
+  <!-- ros2_control for Gazebo -->
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+
+    <!-- Actuated joints (both arms + cell axes you want to command) -->
+    <joint name="kr20_base_link__link1">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="kr20_link1__link2"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link2__link3"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link3__link4"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link4__link5"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link5__flange"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+
+    <joint name="kr120_base_link__link1"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link1__link2"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link2__link3"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link3__link4"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link4__link5"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link5__flange"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+
+    <!-- Add your cell axes if you want to drive them in Gazebo -->
+    <joint name="kr20_fixed_slide_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="rl_base__slider"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="rl_base__lifter"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="rl_slider__plate"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+
+    <!-- If you want to control the gripper joints too, add them: -->
+    <joint name="kr120_pinza_left_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_pinza_right_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_gyro_left_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_gyro_right_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+  </ros2_control>
+
+  <!-- This is the Gazebo plugin you were looking for -->
+  <gazebo>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <!-- Load controller configs from YAML -->
+      <parameters>$(find kr20_kr120_description)/config/ros2_controllers_gazebo.yaml</parameters>
+    </plugin>
+  </gazebo>
+</robot>

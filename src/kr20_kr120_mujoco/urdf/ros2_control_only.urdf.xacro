@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot name="kr_cell" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Minimal URDF: just ros2_control with your joint names -->
+  <ros2_control name="MujocoSystem" type="system">
+    <hardware>
+      <plugin>mujoco_ros2_control/MujocoSystem</plugin>
+    </hardware>
+
+    <!-- KR20 (6R + slide) -->
+    <joint name="kr20_base_link__link1">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="kr20_link1__link2"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link2__link3"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link3__link4"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link4__link5"><command_interface name="pros2_control_only.urdf.xacroosition"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_link5__flange"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr20_fixed_slide_joint">
+      <command_interface name="position"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <!-- KR120 (6R + 2 fingers) -->
+    <joint name="kr120_base_link__link1"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link1__link2"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link2__link3"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link3__link4"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link4__link5"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_link5__flange"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_pinza_left_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+    <joint name="kr120_pinza_right_joint"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
+  </ros2_control>
+</robot>

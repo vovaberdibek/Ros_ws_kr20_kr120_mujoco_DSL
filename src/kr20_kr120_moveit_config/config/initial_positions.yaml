@@ -1,0 +1,15 @@
+# Default initial positions for kr20_kr120's ros2_control fake system
+
+initial_positions:
+  kr120_base_link__link1: 0
+  kr120_link1__link2: 0
+  kr120_link2__link3: 0
+  kr120_link3__link4: 0
+  kr120_link4__link5: 0
+  kr120_link5__flange: 0
+  kr20_base_link__link1: 0
+  kr20_link1__link2: 0
+  kr20_link2__link3: 0
+  kr20_link3__link4: 0
+  kr20_link4__link5: 0
+  kr20_link5__flange: 0

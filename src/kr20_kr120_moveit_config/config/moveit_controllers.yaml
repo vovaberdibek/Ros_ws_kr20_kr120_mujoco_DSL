@@ -1,0 +1,31 @@
+
+# # MoveIt uses this configuration for controller management
+
+moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+moveit_simple_controller_manager:
+  controller_names:
+    - kr20_arm_controller
+    - kr120_arm_controller
+
+  kr20_arm_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory     # -> /kr20_arm_controller/follow_joint_trajectory
+    default: true
+    joints:
+      - kr20_base_link__link1
+      - kr20_link1__link2
+      - kr20_link2__link3
+      - kr20_link3__link4
+      - kr20_link4__link5
+      - kr20_link5__flange
+  kr120_arm_controller:
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    joints:
+      - kr120_base_link__link1
+      - kr120_link1__link2
+      - kr120_link2__link3
+      - kr120_link3__link4
+      - kr120_link4__link5
+      - kr120_link5__flange

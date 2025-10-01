@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+    <xacro:include filename="$(find kr20_kr120_description)/urdf/kr20_macro.xacro"/>
+    
+    <xacro:macro name="kr20_avvitatore" params="parent">
+
+        <xacro:kuka_kr20_r1810 name="kr20_fixed" origin_xyz="0.1175 0 0" origin_rpy="1.5708 3.1415 3.1415" mass="1" ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1" file_dae="package://kr20_kr120_description/visual/kr20_fixed.dae" file_stl="package://kr20_kr120_description/collision/kr20_fixed.stl" scale="0.001 0.001 0.001"/>
+        <xacro:kuka_kr20_r1810 name="kr20_slide" origin_xyz="-0.09159 0 0.252354" origin_rpy="-1.5708 -1.5708 0" mass="1" ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1" file_dae="package://kr20_kr120_description/visual/kr20_slide.dae" file_stl="package://kr20_kr120_description/collision/kr20_slide.stl" scale="0.001 0.001 0.001"/>
+
+        <xacro:kuka_kr20_r1810_joint name="kr20_tool_connector_joint" type="fixed" parent="${parent}" child="kr20_fixed" axis="1 0 0"
+         limit_l="-0.1" limit_u="0.5" limit_v="1" limit_e="100" origin_xyz="0 0 0" origin_rpy="0 0 0" damping="10" friction="10"/> 
+
+        <xacro:kuka_kr20_r1810_joint name="kr20_fixed_slide_joint" type="prismatic" parent="kr20_fixed" child="kr20_slide" axis="0 0 1" 
+                                limit_l="-0.05121" limit_u="0.013863" limit_v="1" limit_e="100" origin_xyz="0.299605 0 -0.252354" origin_rpy="0 0 0" damping="10" friction="10"/>
+
+        <xacro:kuka_kr20_r1810_transmission name="kr20_trans_fixed_slide_joint"
+                            joint_name="kr20_fixed_slide_joint"
+                            actuator_name="kr20_motor_fixed_slide_joint" />
+                
+    </xacro:macro>
+</robot>
+

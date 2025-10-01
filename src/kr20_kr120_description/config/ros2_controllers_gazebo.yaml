@@ -1,0 +1,82 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    kr20_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    kr120_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    # Optional controllers for single joints (use JTC or ForwardCommandController)
+    kr20_slide_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    rl_slider_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    rl_lifter_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    rl_plate_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    kr120_gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+kr20_arm_controller:
+  ros__parameters:
+    joints:
+      - kr20_base_link__link1
+      - kr20_link1__link2
+      - kr20_link2__link3
+      - kr20_link3__link4
+      - kr20_link4__link5
+      - kr20_link5__flange
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+kr120_arm_controller:
+  ros__parameters:
+    joints:
+      - kr120_base_link__link1
+      - kr120_link1__link2
+      - kr120_link2__link3
+      - kr120_link3__link4
+      - kr120_link4__link5
+      - kr120_link5__flange
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+kr20_slide_controller:
+  ros__parameters:
+    joints: [kr20_fixed_slide_joint]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+rl_slider_controller:
+  ros__parameters:
+    joints: [rl_base__slider]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+rl_lifter_controller:
+  ros__parameters:
+    joints: [rl_base__lifter]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+rl_plate_controller:
+  ros__parameters:
+    joints: [rl_slider__plate]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+kr120_gripper_controller:
+  ros__parameters:
+    joints:
+      - kr120_pinza_left_joint
+      - kr120_pinza_right_joint
+      - kr120_gyro_left_joint
+      - kr120_gyro_right_joint
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]

@@ -1,0 +1,64 @@
+<?xml version = "1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <xacro:macro name="kuka_kr120_r2700" params="name origin_xyz origin_rpy mass ixx ixy ixz iyy iyz izz file_dae file_stl scale">
+        <link name="${name}">
+            <inertial>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+                <mass value="${mass}"/>
+                <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}"/>
+            </inertial>
+            <visual>
+                <geometry>
+                    <mesh filename="${file_dae}" scale="${scale}"/>
+                </geometry>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="${file_stl}" scale="${scale}"/>
+                </geometry>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+            </collision>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="kuka_kr120_r2700_joint" params="name type parent child axis limit_l limit_u limit_v limit_e origin_xyz origin_rpy damping friction">
+        <joint name="${name}" type="${type}">
+            <parent link="${parent}"/>
+            <child link="${child}"/>
+            <axis xyz="${axis}"/>
+            <limit lower="${limit_l}" upper="${limit_u}" velocity="${limit_v}" effort="${limit_e}"/>
+            <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+            <dynamics damping="${damping}" friction="${friction}" />
+        </joint> 
+    </xacro:macro>
+
+    <!-- <xacro:macro name="transmission" params="name joint_name actuator_name">
+        <transmission name="${name}" >
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name = "${joint_name}" >
+                <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="${actuator_name}" >
+                <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro> -->
+
+    <xacro:macro name="kuka_kr120_r2700_transmission" params="name joint_name actuator_name">
+        <transmission name="${name}" >
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name = "${joint_name}" >
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="${actuator_name}" >
+                <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+
+</robot>

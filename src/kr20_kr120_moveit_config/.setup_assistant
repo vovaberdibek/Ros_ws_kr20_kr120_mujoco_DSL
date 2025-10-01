@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: kr20_kr120_description
+    relative_path: urdf/kr20_kr120.urdf.xacro
+  srdf:
+    relative_path: config/kr20_kr120.srdf
+  package_settings:
+    author_name: vladimir berdibekov
+    author_email: vladimir.berdibekov@gransassotech.org
+    generated_timestamp: 1756974770

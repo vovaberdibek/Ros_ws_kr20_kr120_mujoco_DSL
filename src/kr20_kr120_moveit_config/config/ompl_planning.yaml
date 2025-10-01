@@ -1,0 +1,208 @@
+ompl:
+  planning_plugin: ompl_interface/OMPLPlanner
+  request_adapters: >-
+    default_planner_request_adapters/FixWorkspaceBounds
+    default_planner_request_adapters/FixStartStateBounds
+    default_planner_request_adapters/FixStartStateCollision
+    default_planner_request_adapters/FixStartStatePathConstraints
+    default_planner_request_adapters/AddTimeOptimalParameterization
+  start_state_max_bounds_error: 0.1
+
+  # 1) Global planner configs (same as ROS1, just nested here)
+  planner_configs:
+    AnytimePathShortening:
+      type: geometric::AnytimePathShortening
+      shortcut: true
+      hybridize: true
+      max_hybrid_paths: 24
+      num_planners: 4
+      planners: ""
+    SBL:
+      type: geometric::SBL
+      range: 0.0
+    EST:
+      type: geometric::EST
+      range: 0.0
+      goal_bias: 0.05
+    LBKPIECE:
+      type: geometric::LBKPIECE
+      range: 0.0
+      border_fraction: 0.9
+      min_valid_path_fraction: 0.5
+    BKPIECE:
+      type: geometric::BKPIECE
+      range: 0.0
+      border_fraction: 0.9
+      failed_expansion_score_factor: 0.5
+      min_valid_path_fraction: 0.5
+    KPIECE:
+      type: geometric::KPIECE
+      range: 0.0
+      goal_bias: 0.05
+      border_fraction: 0.9
+      failed_expansion_score_factor: 0.5
+      min_valid_path_fraction: 0.5
+    RRT:
+      type: geometric::RRT
+      range: 0.0
+      goal_bias: 0.05
+    RRTConnect:
+      type: geometric::RRTConnect
+      range: 0.0
+    RRTstar:
+      type: geometric::RRTstar
+      range: 0.0
+      goal_bias: 0.05
+      delay_collision_checking: 1
+    TRRT:
+      type: geometric::TRRT
+      range: 0.0
+      goal_bias: 0.05
+      max_states_failed: 10
+      temp_change_factor: 2.0
+      min_temperature: 1.0e-9
+      init_temperature: 1.0e-5
+      frontier_threshold: 0.0
+      frontier_node_ratio: 0.1
+      k_constant: 0.0
+    PRM:
+      type: geometric::PRM
+      max_nearest_neighbors: 10
+    PRMstar:
+      type: geometric::PRMstar
+    FMT:
+      type: geometric::FMT
+      num_samples: 1000
+      radius_multiplier: 1.1
+      nearest_k: 1
+      cache_cc: 1
+      heuristics: 0
+      extended_fmt: 1
+    BFMT:
+      type: geometric::BFMT
+      num_samples: 1000
+      radius_multiplier: 1.0
+      nearest_k: 1
+      balanced: 0
+      optimality: 1
+      heuristics: 1
+      cache_cc: 1
+      extended_fmt: 1
+    PDST:
+      type: geometric::PDST
+    STRIDE:
+      type: geometric::STRIDE
+      range: 0.0
+      goal_bias: 0.05
+      use_projected_distance: 0
+      degree: 16
+      max_degree: 18
+      min_degree: 12
+      max_pts_per_leaf: 6
+      estimated_dimension: 0.0
+      min_valid_path_fraction: 0.2
+    BiTRRT:
+      type: geometric::BiTRRT
+      range: 0.0
+      temp_change_factor: 0.1
+      init_temperature: 100
+      frontier_threshold: 0.0
+      frontier_node_ratio: 0.1
+      cost_threshold: 1e300
+    LBTRRT:
+      type: geometric::LBTRRT
+      range: 0.0
+      goal_bias: 0.05
+      epsilon: 0.4
+    BiEST:
+      type: geometric::BiEST
+      range: 0.0
+    ProjEST:
+      type: geometric::ProjEST
+      range: 0.0
+      goal_bias: 0.05
+    LazyPRM:
+      type: geometric::LazyPRM
+      range: 0.0
+    LazyPRMstar:
+      type: geometric::LazyPRMstar
+    SPARS:
+      type: geometric::SPARS
+      stretch_factor: 3.0
+      sparse_delta_fraction: 0.25
+      dense_delta_fraction: 0.001
+      max_failures: 1000
+    SPARStwo:
+      type: geometric::SPARStwo
+      stretch_factor: 3.0
+      sparse_delta_fraction: 0.25
+      dense_delta_fraction: 0.001
+      max_failures: 5000
+    AITstar:
+      type: geometric::AITstar
+      use_k_nearest: 1
+      rewire_factor: 1.001
+      samples_per_batch: 100
+      use_graph_pruning: 1
+      find_approximate_solutions: 0
+      set_max_num_goals: 1
+    ABITstar:
+      type: geometric::ABITstar
+      use_k_nearest: 1
+      rewire_factor: 1.001
+      samples_per_batch: 100
+      use_graph_pruning: 1
+      prune_threshold_as_fractional_cost_change: 0.1
+      delay_rewiring_to_first_solution: 0
+      use_just_in_time_sampling: 0
+      drop_unconnected_samples_on_prune: 0
+      stop_on_each_solution_improvement: 0
+      use_strict_queue_ordering: 0
+      find_approximate_solutions: 0
+      initial_inflation_factor: 1000000
+      inflation_scaling_parameter: 10
+      truncation_scaling_parameter: 5.0
+    BITstar:
+      type: geometric::BITstar
+      use_k_nearest: 1
+      rewire_factor: 1.001
+      samples_per_batch: 100
+      use_graph_pruning: 1
+      prune_threshold_as_fractional_cost_change: 0.1
+      delay_rewiring_to_first_solution: 0
+      use_just_in_time_sampling: 0
+      drop_unconnected_samples_on_prune: 0
+      stop_on_each_solution_improvement: 0
+      use_strict_queue_ordering: 0
+
+  # 2) Group-specific selections (ROS1 blocks moved under group_configs)
+  group_configs:
+    kr20_arm:
+      default_planner_config: RRT
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]
+      projection_evaluator: joints(kr20_base_link__link1,kr20_link1__link2)
+      longest_valid_segment_fraction: 0.005
+
+    kr20_slide:
+      default_planner_config: RRT
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]
+
+    kr120_arm:
+      default_planner_config: RRT
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]
+      projection_evaluator: joints(kr120_base_link__link1,kr120_link1__link2)
+      longest_valid_segment_fraction: 0.005
+
+    kr120_gripper:
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]
+      projection_evaluator: joints(kr120_pinza_left_joint,kr120_gyro_left_joint)
+      longest_valid_segment_fraction: 0.005
+
+    rl_slider:
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]
+
+    rl_lifter:
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]
+
+    rl_plate:
+      planner_configs: [AnytimePathShortening, SBL, EST, LBKPIECE, BKPIECE, KPIECE, RRT, RRTConnect, RRTstar, TRRT, PRM, PRMstar, FMT, BFMT, PDST, STRIDE, BiTRRT, LBTRRT, BiEST, ProjEST, LazyPRM, LazyPRMstar, SPARS, SPARStwo, AITstar, ABITstar, BITstar]

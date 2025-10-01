@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco>
+  <actuator>
+    <!-- KR20 -->
+    <position name="servo_kr20_base_link__link1" joint="kr20_base_link__link1" kp="60"  ctrllimited="true" ctrlrange="-3.22886 3.22886" forcerange="-180 180"/>
+    <position name="servo_kr20_link1__link2"     joint="kr20_link1__link2"     kp="60"  ctrllimited="true" ctrlrange="-1.65806 2.70526"  forcerange="-160 160"/>
+    <position name="servo_kr20_link2__link3"     joint="kr20_link2__link3"     kp="60"  ctrllimited="true" ctrlrange="-3.97935 1.48353"  forcerange="-150 150"/>
+    <position name="servo_kr20_link3__link4"     joint="kr20_link3__link4"     kp="50"  ctrllimited="true" ctrlrange="-6.10865 6.10865"  forcerange="-120 120"/>
+    <position name="servo_kr20_link4__link5"     joint="kr20_link4__link5"     kp="40"  ctrllimited="true" ctrlrange="-2.26893 2.26893"  forcerange="-100 100"/>
+    <position name="servo_kr20_link5__flange"    joint="kr20_link5__flange"    kp="40"  ctrllimited="true" ctrlrange="-6.10865 6.10865"  forcerange="-80 80"/>
+    <position name="servo_kr20_fixed_slide_joint" joint="kr20_fixed_slide_joint" kp="80" ctrllimited="true" ctrlrange="-0.05121 0.013863" forcerange="-200 200"/>
+
+    <!-- KR120 -->
+    <position name="servo_kr120_base_link__link1" joint="kr120_base_link__link1" kp="70"  ctrllimited="true" ctrlrange="-3.22886 3.22886"  forcerange="-220 220"/>
+    <position name="servo_kr120_link1__link2"     joint="kr120_link1__link2"     kp="70"  ctrllimited="true" ctrlrange="-0.872665 1.48353" forcerange="-180 180"/>
+    <position name="servo_kr120_link2__link3"     joint="kr120_link2__link3"     kp="70"  ctrllimited="true" ctrlrange="-3.66519 1.27409" forcerange="-170 170"/>
+    <position name="servo_kr120_link3__link4"     joint="kr120_link3__link4"     kp="55"  ctrllimited="true" ctrlrange="-6.10865 6.10865" forcerange="-140 140"/>
+    <position name="servo_kr120_link4__link5"     joint="kr120_link4__link5"     kp="45"  ctrllimited="true" ctrlrange="-2.18166 2.18166" forcerange="-110 110"/>
+    <position name="servo_kr120_link5__flange"    joint="kr120_link5__flange"    kp="45"  ctrllimited="true" ctrlrange="-6.10865 6.10865" forcerange="-90 90"/>
+
+    <!-- Gripper slides and gyros -->
+    <position name="servo_kr120_pinza_left_joint"  joint="kr120_pinza_left_joint"  kp="200" ctrllimited="true" ctrlrange="0 0.0355"  forcerange="-300 300"/>
+    <position name="servo_kr120_gyro_left_joint"   joint="kr120_gyro_left_joint"   kp="40"  ctrllimited="true" ctrlrange="-3.1415 3.1415" forcerange="-60 60"/>
+    <position name="servo_kr120_pinza_right_joint" joint="kr120_pinza_right_joint" kp="200" ctrllimited="true" ctrlrange="-0.0355 0" forcerange="-300 300"/>
+    <position name="servo_kr120_gyro_right_joint"  joint="kr120_gyro_right_joint"  kp="40"  ctrllimited="true" ctrlrange="-3.1415 3.1415" forcerange="-60 60"/>
+
+    <!-- Lifter/slider/plate -->
+    <position name="servo_rl_base__lifter" joint="rl_base__lifter" kp="80"  ctrllimited="true" ctrlrange="0 0.24"  forcerange="-400 400"/>
+    <position name="servo_rl_base__slider" joint="rl_base__slider" kp="80"  ctrllimited="true" ctrlrange="-1.031 0" forcerange="-400 400"/>
+    <position name="servo_rl_slider__plate" joint="rl_slider__plate" kp="40" ctrllimited="true" ctrlrange="0 6.28319" forcerange="-50 50"/>
+  </actuator>
+</mujoco>

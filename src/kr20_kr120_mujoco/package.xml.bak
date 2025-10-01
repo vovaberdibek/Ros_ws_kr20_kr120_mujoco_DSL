@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>kr20_kr120_mujoco</name>
+  <version>0.0.1</version>
+  <description>MJCF (MuJoCo) cell for KR20 & KR120 with ROS 2 control.</description>
+  <maintainer email="you@example.com">you</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>mujoco_ros2_control</depend>
+  <depend>controller_manager</depend>
+  <depend>ros2_control</depend>
+  <depend>ros2_controllers</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+</package>

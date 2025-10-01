@@ -1,0 +1,55 @@
+Thu Sep 11 17:47:43 2025
+ERROR: Load model error: Error: free joint can only be used on top level
+Element name 'peg', id 10, line 0
+
+Thu Sep 11 17:48:16 2025
+ERROR: Load model error: Error: free joint can only be used on top level
+Element name 'peg', id 10, line 0
+
+Thu Sep 11 17:48:34 2025
+ERROR: Load model error: Error: free joint can only be used on top level
+Element name 'peg', id 10, line 0
+
+Thu Sep 11 17:49:56 2025
+ERROR: Load model error: Error: free joint can only be used on top level
+Element name 'peg', id 10, line 0
+
+Mon Sep 29 12:31:18 2025
+ERROR: Load model error: ParseXML: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/world_mujoco.xml': No such file or directory
+
+Mon Sep 29 12:31:38 2025
+ERROR: Load model error: ParseXML: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/world_mujoco.xml': No such file or directory
+
+Mon Sep 29 12:42:35 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/kr20_basement.obj': No such file or directory
+
+Mon Sep 29 14:15:36 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/meshes/kr20_basement.obj': No such file or directory
+
+Tue Sep 30 10:14:54 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/meshes/kr20_basement.obj': No such file or directory
+
+Tue Sep 30 10:16:34 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/kr20_basement.obj': No such file or directory
+
+Tue Sep 30 10:20:59 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/meshes/kr20_basement.obj': No such file or directory
+
+Tue Sep 30 10:30:02 2025
+ERROR: Load model error: ParseXML: Error opening file '/home/user/Desktop/ros2_ws/src/kr20_kr120_description/mujoco/kuka_cell_scene.xml': No such file or directory
+
+Tue Sep 30 10:34:05 2025
+ERROR: Load model error: ParseXML: Error opening file '/home/user/Desktop/ros2_ws/src/kr20_kr120_description/mujoco/kuka_cell_scene.xml': No such file or directory
+
+Tue Sep 30 11:13:35 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/src/kr20_kr120_description/mujoco/scenes/meshes/kr20_basement.obj': No such file or directory
+
+Tue Sep 30 11:15:28 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/src/kr20_kr120_description/mujoco/meshes/kr20_base.obj': No such file or directory
+
+Tue Sep 30 11:27:52 2025
+ERROR: Load model error: ParseXML: Error opening file '/home/user/Desktop/ros2_ws/src/kr20_kr120_description/mujoco/kuka_cell_scene.xml': No such file or directory
+
+Tue Sep 30 11:31:02 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/kr20_basement.obj': No such file or directory
+

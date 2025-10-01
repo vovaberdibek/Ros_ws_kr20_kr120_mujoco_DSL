@@ -1,0 +1,22 @@
+<mujoco model="robot_cell">
+  <compiler angle="radian" autolimits="true"/>
+  <option timestep="0.002"/>
+
+  <!-- Include your converted robot MJCF. If this file lives in the same folder, the relative path works. -->
+  <include file="robot_mjcf.xml"/>
+
+  <worldbody>
+    <!-- Simple environment: table and tray (edit positions to match your cell) -->
+    <geom name="table" type="box" size="0.8 0.6 0.02" pos="1.25 -0.12 0.01" rgba="0.7 0.7 0.7 1"/>
+    <geom name="tray"  type="box" size="0.2 0.15 0.01" pos="1.25 -0.12 0.05" rgba="0.3 0.3 0.3 1"/>
+  </worldbody>
+
+  <!-- ros2_control integration plugin; the node is launched by ros2 run, parameters can be overridden via ROS -->
+  <extension>
+    <plugin plugin="mujoco_ros2_control::MujocoSystem">
+      <param name="joint_state_topic">/joint_states</param>
+      <param name="controller_manager_ns">/controller_manager</param>
+      <!-- Add more params here if your setup requires them -->
+    </plugin>
+  </extension>
+</mujoco>

@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco model="kuka_cell">
+  <compiler angle="radian" inertiafromgeom="false" autolimits="true" meshdir="../assets"/>
+  <option gravity="0 0 -9.81" integrator="implicitfast" timestep="0.001"
+          cone="pyramidal" jacobian="dense" iterations="80" tolerance="1e-9"/>
+
+  <default>
+    <!-- Visual meshes (no contact) -->
+    <default class="vis">
+      <geom type="mesh" contype="0" conaffinity="0" group="3" margin="0"/>
+    </default>
+
+    <!-- Environment colliders -->
+    <default class="env">
+      <geom contype="1" conaffinity="3" group="2"
+            friction="1.2 0.01 0.001" margin="0.003"
+            solimp="0.90 0.99 0.001" solref="0.005 1"/>
+    </default>
+
+    <!-- Robot link colliders: collide only with env -->
+    <default class="col">
+      <geom type="mesh" contype="2" conaffinity="1" group="1"
+            friction="0.8 0.01 0.001" margin="0.003"
+            solimp="0.90 0.99 0.001" solref="0.005 1"/>
+    </default>
+
+    <!-- Joint damping so passive arms don’t blow up -->
+    <default class="robot_joint">
+      <joint damping="15" armature="0.05" frictionloss="0"/>
+    </default>
+    <default class="robot_slider">
+      <joint type="slide" damping="20" armature="0.03" frictionloss="0"/>
+    </default>
+
+    <!-- Pedestals / walls that should NOT collide -->
+    <default class="base_nocoll">
+      <geom type="mesh" contype="0" conaffinity="0" group="3" margin="0"/>
+    </default>
+  </default>
+
+  <asset>
+    <!-- KR20 -->
+    <mesh name="kr20_basement" file="kr20_basement.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_base"      file="kr20_base.obj"      scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse1"     file="kr20_asse1.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse2"     file="kr20_asse2.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse3"     file="kr20_asse3.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse4"     file="kr20_asse4.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse5"     file="kr20_asse5.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_flange"    file="kr20_flange.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_polso"     file="kr20_polso.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_fixed"     file="kr20_fixed.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_slide"     file="kr20_slide.obj"     scale="0.001 0.001 0.001"/>
+
+    <!-- KR120 -->
+    <mesh name="kr120_basement" file="kr120_basement.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_base"     file="kr120_base.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse1"    file="kr120_asse1.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse2"    file="kr120_asse2.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse3"    file="kr120_asse3.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse4"    file="kr120_asse4.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse5"    file="kr120_asse5.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_flange"   file="kr120_flange.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_slider"   file="kr120_slider.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_pinza_left"  file="kr120_pinza_left.obj"  scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_pinza_right" file="kr120_pinza_right.obj" scale="0.001 0.001 0.001"/>
+
+    <!-- Cell -->
+    <mesh name="pareti"            file="pareti.obj"            scale="0.001 0.001 0.001"/>
+    <mesh name="rl_infrastruttura" file="rl_infrastruttura.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="rl_piastra"        file="rl_piastra.obj"        scale="0.001 0.001 0.001"/>
+    <mesh name="rl_lifter"         file="rl_lifter.obj"         scale="0.001 0.001 0.001"/>
+  </asset>
+
+  <worldbody>
+    <light name="fill" pos="2 -2 3" dir="-1 1 -2" directional="true" diffuse="0.8 0.8 0.8"/>
+
+    <!-- Solid floor -->
+    <geom name="floor" class="env" type="plane" size="0 0 0.05" pos="0 0 0"/>
+
+    <!-- Bases and fence: visual-only so we never start interpenetrating -->
+    <geom class="base_nocoll" pos="-0.367501 -0.164999 0" quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="kr20_basement"/>
+    <geom class="base_nocoll" pos="0 0 0.551"           quat="0.707105 0 0 -0.707108"      type="mesh" mesh="kr20_base"/>
+
+    <geom class="base_nocoll" pos="3.5475 -2.69499 0"   quat="0.499998 -0.5 -0.500002 0.5" type="mesh" mesh="kr120_basement"/>
+    <geom class="base_nocoll" pos="1.59 -1.43 0.529"    quat="0.707105 0 0 0.707108"       type="mesh" mesh="kr120_base"/>
+
+    <geom class="base_nocoll" pos="-0.0485 -0.5405 0" quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="pareti"/>
+
+    <!-- A simple table collider to catch links -->
+    <geom name="table" class="env" type="box" pos="0.75 -0.2 0.45" size="0.6 0.5 0.45"/>
+
+    <!-- KR20 anchored (no free joint at base) -->
+    <body name="kr20_anchor" quat="0.707105 0 0 -0.707108">
+      <body name="kr20_link1">
+        <inertial pos="0 0 0" mass="12.0" diaginertia="0.20 0.20 0.20"/>
+        <joint class="robot_joint" name="kr20_base_link__link1" axis="0 0 1" range="-3.22886 3.22886"/>
+        <geom class="col" pos="0 0 0.551" type="mesh" mesh="kr20_asse1"/>
+
+        <body name="kr20_link2" pos="0.16 0 1.071">
+          <inertial pos="0 0 0" mass="8.0" diaginertia="0.15 0.15 0.10"/>
+          <joint class="robot_joint" name="kr20_link1__link2" axis="0 1 0" range="-1.65806 2.70526"/>
+          <geom class="col" pos="-0.16 0 -0.52" type="mesh" mesh="kr20_asse2"/>
+
+          <body name="kr20_link3" pos="0 0 0.78">
+            <inertial pos="0 0 0" mass="6.0" diaginertia="0.08 0.08 0.06"/>
+            <joint class="robot_joint" name="kr20_link2__link3" axis="0 1 0" range="-3.97935 1.48353"/>
+            <geom class="col" pos="-0.16 0 -1.3" type="mesh" mesh="kr20_asse3"/>
+
+            <body name="kr20_link4" pos="0.233 0 0.15">
+              <inertial pos="0 0 0" mass="4.0" diaginertia="0.05 0.05 0.04"/>
+              <joint class="robot_joint" name="kr20_link3__link4" axis="1 0 0" range="-6.10865 6.10865"/>
+              <geom class="col" pos="-0.393 0 -1.45" type="mesh" mesh="kr20_asse4"/>
+
+              <body name="kr20_link5" pos="0.627 0 0">
+                <inertial pos="0 0 0" mass="3.0" diaginertia="0.03 0.03 0.02"/>
+                <joint class="robot_joint" name="kr20_link4__link5" axis="0 1 0" range="-2.26893 2.26893"/>
+                <geom class="col" pos="-1.02 0 -1.45" type="mesh" mesh="kr20_asse5"/>
+
+                <body name="kr20_flange" pos="0.153 0 0">
+                  <inertial pos="0 0 0" mass="2.0" diaginertia="0.02 0.02 0.015"/>
+                  <joint class="robot_joint" name="kr20_link5__flange" axis="1 0 0" range="-6.10865 6.10865"/>
+                  <geom class="col" pos="-1.246 0 -1.45" type="mesh" mesh="kr20_flange"/>
+                  <geom class="col" pos="0.066 0 0" quat="0.499998 -0.500002 0.5 0.5" type="mesh" mesh="kr20_polso"/>
+
+                  <body name="kr20_slide" pos="0.299605 0 -0.252354">
+                    <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                    <joint class="robot_slider" name="kr20_fixed_slide_joint" axis="0 0 1" range="-0.05121 0.013863"/>
+                    <geom class="col" pos="-0.09159 0 0.252354" quat="0.499998 -0.5 -0.5 -0.500002" type="mesh" mesh="kr20_slide"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- KR120 anchored -->
+    <body name="kr120_anchor" pos="1.59 -1.43 0" quat="0.707105 0 0 0.707108">
+      <body name="kr120_link1">
+        <inertial pos="0 0 0" mass="20.0" diaginertia="0.35 0.35 0.35"/>
+        <joint class="robot_joint" name="kr120_base_link__link1" axis="0 0 1" range="-3.22886 3.22886"/>
+        <geom class="col" pos="0 0 0.529" type="mesh" mesh="kr120_asse1"/>
+
+        <body name="kr120_link2" pos="0.33 0 1.174">
+          <inertial pos="0 0 0" mass="12.0" diaginertia="0.25 0.18 0.18"/>
+          <joint class="robot_joint" name="kr120_link1__link2" axis="0 1 0" range="-0.872665 1.48353"/>
+          <geom class="col" pos="-0.33 0 -0.645" type="mesh" mesh="kr120_asse2"/>
+
+          <body name="kr120_link3" pos="0 0 1.15">
+            <inertial pos="0 0 0" mass="10.0" diaginertia="0.20 0.16 0.16"/>
+            <joint class="robot_joint" name="kr120_link2__link3" axis="0 1 0" range="-3.66519 1.27409"/>
+            <geom class="col" pos="-0.33 0 -1.795" type="mesh" mesh="kr120_asse3"/>
+
+            <body name="kr120_link4" pos="0.367 0 0.115">
+              <inertial pos="0 0 0" mass="8.0" diaginertia="0.15 0.12 0.12"/>
+              <joint class="robot_joint" name="kr120_link3__link4" axis="1 0 0" range="-6.10865 6.10865"/>
+              <geom class="col" pos="-0.697 0 -1.91" type="mesh" mesh="kr120_asse4"/>
+
+              <body name="kr120_link5" pos="0.853 0 0">
+                <inertial pos="0 0 0" mass="6.0" diaginertia="0.10 0.09 0.09"/>
+                <joint class="robot_joint" name="kr120_link4__link5" axis="0 1 0" range="-2.18166 2.18166"/>
+                <geom class="col" pos="-1.55 0 -1.91" type="mesh" mesh="kr120_asse5"/>
+
+                <body name="kr120_flange" pos="0.215 0 0">
+                  <inertial pos="0 0 0" mass="4.0" diaginertia="0.06 0.06 0.06"/>
+                  <joint class="robot_joint" name="kr120_link5__flange" axis="1 0 0" range="-6.10865 6.10865"/>
+                  <geom class="col" pos="-1.765 0 -1.91" type="mesh" mesh="kr120_flange"/>
+                  <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_slider"/>
+
+                  <body name="kr120_pinza_left">
+                    <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                    <joint class="robot_slider" name="kr120_pinza_left_joint" axis="0 1 0" range="0 0.0355"/>
+                    <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_left"/>
+                  </body>
+                  <body name="kr120_pinza_right">
+                    <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                    <joint class="robot_slider" name="kr120_pinza_right_joint" axis="0 1 0" range="-0.0355 0"/>
+                    <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_right"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- RL platform (colliding) -->
+    <body name="rl_lifter" pos="0 -1.43 0.01">
+      <inertial pos="0 0 0" mass="20.0" diaginertia="0.4 0.4 0.4"/>
+      <joint name="rl_base__lifter" axis="0 0 1" type="slide" range="0 0.24" damping="20"/>
+      <geom class="env" pos="-0.3455 0 -0.02" quat="0.499998 0.5 0.500002 0.5" type="mesh" mesh="rl_lifter"/>
+
+      <body name="rl_slider">
+        <inertial pos="0 0 0" mass="12.0" diaginertia="0.25 0.25 0.25"/>
+        <joint name="rl_base__slider" axis="1 0 0" type="slide" range="-1.031 0" damping="20"/>
+
+        <body name="rl_plate">
+          <inertial pos="0 0 0" mass="6.0" diaginertia="0.08 0.08 0.08"/>
+          <joint name="rl_slider__plate" axis="0 0 1" type="hinge" range="0 6.28319" damping="2"/>
+          <geom class="env" pos="0 0 0.473" type="mesh" mesh="rl_piastra"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- no actuators yet -->
+</mujoco>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <?xml version="1.0" encoding="utf-8"?>
+<mujoco model="kuka_cell">
+  <compiler angle="radian" inertiafromgeom="false" autolimits="true" meshdir="../assets"/>
+  <option gravity="0 0 -9.81" integrator="implicitfast" timestep="0.001"
+          cone="pyramidal" jacobian="dense" iterations="80" tolerance="1e-9"/>
+
+  <!-- ===== Nice-ish viewer defaults ===== -->
+  <visual>
+    <headlight diffuse="0.7 0.7 0.7" ambient="0.25 0.25 0.25" specular="0.15 0.15 0.15"/>
+    <rgba haze="0.10 0.15 0.20 1"/>
+    <map znear="0.001" zfar="10"/>
+  </visual>
+  <statistic center="0.7 -0.6 0.8" extent="3.0"/>
+
+  <!-- ===== Defaults / Contact policy (unchanged physics) ===== -->
+  <default>
+    <!-- Visual meshes (no contact) -->
+    <default class="vis">
+      <geom type="mesh" contype="0" conaffinity="0" group="3" margin="0"/>
+    </default>
+
+    <!-- Environment colliders -->
+    <default class="env">
+      <geom contype="1" conaffinity="3" group="2"
+            friction="1.2 0.01 0.001" margin="0.003"
+            solimp="0.90 0.99 0.001" solref="0.005 1"/>
+    </default>
+
+    <!-- Robot link colliders: collide only with env -->
+    <default class="col">
+      <geom type="mesh" contype="2" conaffinity="1" group="1"
+            friction="0.8 0.01 0.001" margin="0.003"
+            solimp="0.90 0.99 0.001" solref="0.005 1"/>
+    </default>
+
+    <!-- Joint damping so passive arms don’t blow up -->
+    <default class="robot_joint">
+      <joint damping="15" armature="0.05" frictionloss="0"/>
+    </default>
+    <default class="robot_slider">
+      <joint type="slide" damping="20" armature="0.03" frictionloss="0"/>
+    </default>
+
+    <!-- Pedestals / bases that should NOT collide (visual-only now) -->
+    <default class="base_nocoll">
+      <geom type="mesh" contype="0" conaffinity="0" group="3" margin="0"/>
+    </default>
+  </default>
+
+  <!-- ===== Assets ===== -->
+  <asset>
+    <!-- KR20 -->
+    <mesh name="kr20_basement" file="kr20_basement.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_base"      file="kr20_base.obj"      scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse1"     file="kr20_asse1.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse2"     file="kr20_asse2.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse3"     file="kr20_asse3.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse4"     file="kr20_asse4.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse5"     file="kr20_asse5.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_flange"    file="kr20_flange.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_polso"     file="kr20_polso.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_fixed"     file="kr20_fixed.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_slide"     file="kr20_slide.obj"     scale="0.001 0.001 0.001"/>
+
+    <!-- KR120 -->
+    <mesh name="kr120_basement" file="kr120_basement.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_base"     file="kr120_base.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse1"    file="kr120_asse1.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse2"    file="kr120_asse2.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse3"    file="kr120_asse3.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse4"    file="kr120_asse4.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse5"    file="kr120_asse5.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_flange"   file="kr120_flange.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_slider"   file="kr120_slider.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_pinza_left"  file="kr120_pinza_left.obj"  scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_pinza_right" file="kr120_pinza_right.obj" scale="0.001 0.001 0.001"/>
+
+    <!-- Cell -->
+    <mesh name="pareti"            file="pareti.obj"            scale="0.001 0.001 0.001"/>
+    <mesh name="rl_infrastruttura" file="rl_infrastruttura.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="rl_piastra"        file="rl_piastra.obj"        scale="0.001 0.001 0.001"/>
+    <mesh name="rl_lifter"         file="rl_lifter.obj"         scale="0.001 0.001 0.001"/>
+
+    <material name="env_mtl"   rgba="0.35 0.38 0.42 1"/>
+    <material name="kr20_mtl"  rgba="1.00 0.60 0.05 1"/>
+    <material name="kr120_mtl" rgba="1.00 0.50 0.00 1"/>
+  </asset>
+
+  <!-- ===== World / Cell ===== -->
+  <worldbody>
+    <!-- Lights -->
+    <light name="sun" directional="true" pos="0 0 5" dir="0 0 -1" diffuse="0.9 0.9 0.9" specular="0.2 0.2 0.2"/>
+    <light name="fill_kr20" pos="0.4 -0.5 1.6" diffuse="0.7 0.7 0.7" specular="0.1 0.1 0.1" cutoff="70" exponent="10"/>
+    <light name="fill_kr120" pos="1.9 -1.6 1.8" diffuse="0.7 0.7 0.7" specular="0.1 0.1 0.1" cutoff="70" exponent="10"/>
+
+    <!-- Solid floor (colliding) -->
+    <geom name="floor" class="env" type="plane" size="0 0 0.05" pos="0 0 0" material="env_mtl"/>
+
+    <!-- Accurate cell pieces: visual-only NOW (safe), flip to env later -->
+    <geom class="base_nocoll" pos="-0.367501 -0.164999 0"
+          quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="kr20_basement"/>
+          <!-- to enable collisions: change class to env -->
+
+    <geom class="base_nocoll" pos="0 0 0.551"
+          quat="0.707105 0 0 -0.707108" type="mesh" mesh="kr20_base"/>
+          <!-- to enable collisions: change class to env -->
+
+    <geom class="base_nocoll" pos="3.5475 -2.69499 0"
+          quat="0.499998 -0.5 -0.500002 0.5" type="mesh" mesh="kr120_basement"/>
+          <!-- to enable collisions: change class to env -->
+
+    <geom class="base_nocoll" pos="1.59 -1.43 0.529"
+          quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_base"/>
+          <!-- to enable collisions: change class to env -->
+
+    <!-- Walls / guards: keep visual for now, flip later if needed -->
+    <geom class="base_nocoll" pos="-0.0485 -0.5405 0"
+          quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="pareti"/>
+          <!-- to enable collisions: change class to env -->
+
+    <!-- Guard boxes / fixtures from accurate cell (visual now) -->
+    <geom class="base_nocoll" type="box" size="0.625 0.6 0.409"  pos="1.252 -0.12 0.413"/>
+    <geom class="base_nocoll" type="box" size="0.02  0.075 0.005" pos="1.35133 0.293226 1.10162"/>
+    <geom class="base_nocoll" type="box" size="0.02  0.075 0.005" pos="1.35133 -0.025761 1.10162"/>
+    <geom class="base_nocoll" type="box" size="0.02  0.075 0.005" pos="0.672197 -0.025761 1.10162"/>
+    <geom class="base_nocoll" type="box" size="0.02  0.075 0.005" pos="0.672197 0.293226 1.10162"/>
+    <!-- to enable collisions for any of the above: change class to env -->
+
+    <!-- Infrastructure mesh (visual now; flip later) -->
+    <geom class="base_nocoll" pos="0.096703 -1.43 0.66625"
+          quat="0.707105 0 0 0.707108" type="mesh" mesh="rl_infrastruttura"/>
+          <!-- to enable collisions: change class to env -->
+
+    <!-- A simple colliding "safety" table under KR20 (kept from stable physics) -->
+    <geom name="table_proxy" class="env" type="box" pos="0.75 -0.2 0.45" size="0.6 0.5 0.45"/>
+
+    <!-- ========== KR20: ANCHORED BASE (stable) ========== -->
+    <body name="kr20_anchor" quat="0.707105 0 0 -0.707108">
+      <!-- fixed to world: NO joint here -->
+      <body name="kr20_link1">
+        <inertial pos="0 0 0" mass="12.0" diaginertia="0.20 0.20 0.20"/>
+        <joint class="robot_joint" name="kr20_base_link__link1" axis="0 0 1" range="-3.22886 3.22886"/>
+        <geom class="col" pos="0 0 0.551" quat="1 0 0 0" type="mesh" mesh="kr20_asse1" material="kr20_mtl"/>
+
+        <body name="kr20_link2" pos="0.16 0 1.071">
+          <inertial pos="0 0 0" mass="8.0" diaginertia="0.15 0.15 0.10"/>
+          <joint class="robot_joint" name="kr20_link1__link2" axis="0 1 0" range="-1.65806 2.70526"/>
+          <geom class="col" pos="-0.16 0 -0.52" type="mesh" mesh="kr20_asse2" material="kr20_mtl"/>
+
+          <body name="kr20_link3" pos="0 0 0.78">
+            <inertial pos="0 0 0" mass="6.0" diaginertia="0.08 0.08 0.06"/>
+            <joint class="robot_joint" name="kr20_link2__link3" axis="0 1 0" range="-3.97935 1.48353"/>
+            <geom class="col" pos="-0.16 0 -1.3" type="mesh" mesh="kr20_asse3" material="kr20_mtl"/>
+
+            <body name="kr20_link4" pos="0.233 0 0.15">
+              <inertial pos="0 0 0" mass="4.0" diaginertia="0.05 0.05 0.04"/>
+              <joint class="robot_joint" name="kr20_link3__link4" axis="1 0 0" range="-6.10865 6.10865"/>
+              <geom class="col" pos="-0.393 0 -1.45" type="mesh" mesh="kr20_asse4" material="kr20_mtl"/>
+
+              <body name="kr20_link5" pos="0.627 0 0">
+                <inertial pos="0 0 0" mass="3.0" diaginertia="0.03 0.03 0.02"/>
+                <joint class="robot_joint" name="kr20_link4__link5" axis="0 1 0" range="-2.26893 2.26893"/>
+                <geom class="col" pos="-1.02 0 -1.45" type="mesh" mesh="kr20_asse5" material="kr20_mtl"/>
+
+                <body name="kr20_flange" pos="0.153 0 0">
+                  <inertial pos="0 0 0" mass="2.0" diaginertia="0.02 0.02 0.015"/>
+                  <joint class="robot_joint" name="kr20_link5__flange" axis="1 0 0" range="-6.10865 6.10865"/>
+                  <geom class="col" pos="-1.246 0 -1.45" type="mesh" mesh="kr20_flange" material="kr20_mtl"/>
+                  <geom class="col" pos="0.066 0 0" quat="0.499998 -0.500002 0.5 0.5" type="mesh" mesh="kr20_polso" material="kr20_mtl"/>
+
+                  <body name="kr20_slide" pos="0.299605 0 -0.252354">
+                    <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                    <joint class="robot_slider" name="kr20_fixed_slide_joint" axis="0 0 1" range="-0.05121 0.013863"/>
+                    <geom class="col" pos="-0.09159 0 0.252354" quat="0.499998 -0.5 -0.5 -0.500002" type="mesh" mesh="kr20_slide" material="kr20_mtl"/>
+                  </body>
+
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- ========== KR120: ANCHORED BASE (stable) ========== -->
+    <body name="kr120_anchor" pos="1.59 -1.43 0" quat="0.707105 0 0 0.707108">
+      <!-- fixed to world: NO joint here -->
+      <body name="kr120_link1">
+        <inertial pos="0 0 0" mass="20.0" diaginertia="0.35 0.35 0.35"/>
+        <joint class="robot_joint" name="kr120_base_link__link1" axis="0 0 1" range="-3.22886 3.22886"/>
+        <geom class="col" pos="0 0 0.529" type="mesh" mesh="kr120_asse1" material="kr120_mtl"/>
+
+        <body name="kr120_link2" pos="0.33 0 1.174">
+          <inertial pos="0 0 0" mass="12.0" diaginertia="0.25 0.18 0.18"/>
+          <joint class="robot_joint" name="kr120_link1__link2" axis="0 1 0" range="-0.872665 1.48353"/>
+          <geom class="col" pos="-0.33 0 -0.645" type="mesh" mesh="kr120_asse2" material="kr120_mtl"/>
+
+          <body name="kr120_link3" pos="0 0 1.15">
+            <inertial pos="0 0 0" mass="10.0" diaginertia="0.20 0.16 0.16"/>
+            <joint class="robot_joint" name="kr120_link2__link3" axis="0 1 0" range="-3.66519 1.27409"/>
+            <geom class="col" pos="-0.33 0 -1.795" type="mesh" mesh="kr120_asse3" material="kr120_mtl"/>
+
+            <body name="kr120_link4" pos="0.367 0 0.115">
+              <inertial pos="0 0 0" mass="8.0" diaginertia="0.15 0.12 0.12"/>
+              <joint class="robot_joint" name="kr120_link3__link4" axis="1 0 0" range="-6.10865 6.10865"/>
+              <geom class="col" pos="-0.697 0 -1.91" type="mesh" mesh="kr120_asse4" material="kr120_mtl"/>
+
+              <body name="kr120_link5" pos="0.853 0 0">
+                <inertial pos="0 0 0" mass="6.0" diaginertia="0.10 0.09 0.09"/>
+                <joint class="robot_joint" name="kr120_link4__link5" axis="0 1 0" range="-2.18166 2.18166"/>
+                <geom class="col" pos="-1.55 0 -1.91" type="mesh" mesh="kr120_asse5" material="kr120_mtl"/>
+
+                <body name="kr120_flange" pos="0.215 0 0">
+                  <inertial pos="0 0 0" mass="4.0" diaginertia="0.06 0.06 0.06"/>
+                  <joint class="robot_joint" name="kr120_link5__flange" axis="1 0 0" range="-6.10865 6.10865"/>
+                  <geom class="col" pos="-1.765 0 -1.91" type="mesh" mesh="kr120_flange" material="kr120_mtl"/>
+                  <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_slider" material="kr120_mtl"/>
+
+                  <!-- Fingers -->
+                  <body name="kr120_pinza_left">
+                    <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                    <joint class="robot_slider" name="kr120_pinza_left_joint" axis="0 1 0" range="0 0.0355"/>
+                    <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_left"/>
+                  </body>
+                  <body name="kr120_pinza_right">
+                    <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                    <joint class="robot_slider" name="kr120_pinza_right_joint" axis="0 1 0" range="-0.0355 0"/>
+                    <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_right"/>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- RL platform (with inertials, colliding) -->
+    <body name="rl_lifter" pos="0 -1.43 0.01">
+      <inertial pos="0 0 0" mass="20.0" diaginertia="0.4 0.4 0.4"/>
+      <joint name="rl_base__lifter" axis="0 0 1" type="slide" range="0 0.24" damping="20"/>
+      <geom class="env" pos="-0.3455 0 -0.02" quat="0.499998 0.5 0.500002 0.5" type="mesh" mesh="rl_lifter" material="env_mtl"/>
+
+      <body name="rl_slider">
+        <inertial pos="0 0 0" mass="12.0" diaginertia="0.25 0.25 0.25"/>
+        <joint name="rl_base__slider" axis="1 0 0" type="slide" range="-1.031 0" damping="20"/>
+
+        <body name="rl_plate">
+          <inertial pos="0 0 0" mass="6.0" diaginertia="0.08 0.08 0.08"/>
+          <joint name="rl_slider__plate" axis="0 0 1" type="hinge" range="0 6.28319" damping="2"/>
+          <geom class="env" pos="0 0 0.473" type="mesh" mesh="rl_piastra" material="env_mtl"/>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- No actuators yet (passive). Add ROS controllers later. -->
+</mujoco>
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="kr20_kr120">
+  <compiler angle="radian" inertiafromgeom="false" autolimits="true" meshdir="../assets"/>
+  <option integrator="implicitfast" timestep="0.002"
+          cone="pyramidal" jacobian="dense"
+          iterations="50" tolerance="1e-9" noslip_iterations="10" noslip_tolerance="1e-9" gravity="0 0 -9.81"
+/>
+
+  <!-- Global-ish contact softening -->
+  <default>
+    <!-- Visuals -->
+    <default class="vis">
+      <geom type="mesh" contype="0" conaffinity="0" group="2" margin="0"/>
+    </default>
+
+    <!-- Environment colliders -->
+    <default class="env">
+      <geom contype="1" conaffinity="3" group="2"
+            margin="0.003" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    </default>
+
+    <!-- Robot links: collide with env only -->
+    <default class="col">
+      <geom type="mesh" contype="2" conaffinity="1" group="1"
+            margin="0.003" solimp="0.95 0.99 0.001" solref="0.005 1"/>
+    </default>
+
+    <!-- Robot joint defaults (Panda-like “feel”) -->
+    <default class="robot_joint">
+      <joint armature="0.1" damping="1" frictionloss="0" />
+    </default>
+
+    <!-- Sliders (grippers/rail) slightly higher damping -->
+    <default class="robot_slider">
+      <joint armature="0.05" damping="4" frictionloss="0" type="slide"/>
+    </default>
+
+    <!-- Environment (bases, walls, floor helpers that must NOT collide) -->
+    <default class="base_nocoll">
+      <geom contype="0" conaffinity="0" group="2" margin="0"/>
+    </default>
+  </default>
+
+  <asset>
+    
+    <mesh name="kr20_basement" file="kr20_basement.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_base"      file="kr20_base.obj"      scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse1"     file="kr20_asse1.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse2"     file="kr20_asse2.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse3"     file="kr20_asse3.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse4"     file="kr20_asse4.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_asse5"     file="kr20_asse5.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_flange"    file="kr20_flange.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_polso"     file="kr20_polso.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_fixed"     file="kr20_fixed.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr20_slide"     file="kr20_slide.obj"     scale="0.001 0.001 0.001"/>
+
+    <mesh name="kr120_basement" file="kr120_basement.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_base"     file="kr120_base.obj"     scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse1"    file="kr120_asse1.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse2"    file="kr120_asse2.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse3"    file="kr120_asse3.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse4"    file="kr120_asse4.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_asse5"    file="kr120_asse5.obj"    scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_flange"   file="kr120_flange.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_slider"   file="kr120_slider.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_pinza_left"  file="kr120_pinza_left.obj"  scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_pinza_right" file="kr120_pinza_right.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_gyro_left"   file="kr120_gyro_left.obj"   scale="0.001 0.001 0.001"/>
+    <mesh name="kr120_gyro_right"  file="kr120_gyro_right.obj"  scale="0.001 0.001 0.001"/>
+
+    <mesh name="pareti"            file="pareti.obj"            scale="0.001 0.001 0.001"/>
+    <mesh name="rl_infrastruttura" file="rl_infrastruttura.obj" scale="0.001 0.001 0.001"/>
+    <mesh name="rl_piastra"        file="rl_piastra.obj"        scale="0.001 0.001 0.001"/>
+    <mesh name="rl_lifter"         file="rl_lifter.obj"         scale="0.001 0.001 0.001"/>
+
+    <material name="col_mtl"   rgba="0.40 0.40 0.40 1"/>
+    <material name="vis_mtl"   rgba="0.86 0.88 0.92 1"/>
+    <material name="env_mtl"   rgba="0.35 0.38 0.42 1"/>
+    <material name="kr20_mtl"  rgba="1.00 0.60 0.05 1"/>
+    <material name="kr120_mtl" rgba="1.00 0.50 0.00 1"/>
+  </asset>
+
+  <worldbody>
+    <!-- ENVIRONMENT -->
+    <!-- Floor plane so things can actually rest -->
+    <geom name="floor" type="plane" size="0 0 0.05" pos="0 0 0"
+          material="env_mtl" contype="1" conaffinity="1" friction="1.2 0.01 0.001"/>
+
+    <!-- AFTER -->
+    <geom class="base_nocoll" pos="-0.367501 -0.164999 0" quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="kr20_basement" material="env_mtl"/>
+    <geom class="base_nocoll" pos="0 0 0.551"           quat="0.707105 0 0 -0.707108"      type="mesh" mesh="kr20_base"      material="env_mtl"/>
+    <geom class="base_nocoll" pos="3.5475 -2.69499 0"   quat="0.499998 -0.5 -0.500002 0.5" type="mesh" mesh="kr120_basement" material="env_mtl"/>
+    <geom class="base_nocoll" pos="1.59 -1.43 0.529"    quat="0.707105 0 0 0.707108"       type="mesh" mesh="kr120_base"     material="env_mtl"/>
+
+    <geom class="env" pos="-0.0485 -0.5405 0"   quat="0.499998 -0.5 0.500002 -0.5" type="mesh" mesh="pareti"  material="env_mtl"/>
+
+    <!-- these boxes look like guards/fixtures -> treat as env -->
+    <geom class="env" type="box" size="0.625 0.6 0.409"  pos="1.252 -0.12 0.413"/>
+    <geom class="env" type="box" size="0.02 0.075 0.005" pos="1.35133 0.293226 1.10162"/>
+    <geom class="env" type="box" size="0.02 0.075 0.005" pos="1.35133 -0.025761 1.10162"/>
+    <geom class="env" type="box" size="0.02 0.075 0.005" pos="0.672197 -0.025761 1.10162"/>
+    <geom class="env" type="box" size="0.02 0.075 0.005" pos="0.672197 0.293226 1.10162"/>
+
+    <geom class="env" pos="0.096703 -1.43 0.66625" quat="0.707105 0 0 0.707108" type="mesh" mesh="rl_infrastruttura" material="env_mtl"/>
+
+    <!-- KR20 -->
+    <body name="kr20_link1" quat="0.707105 0 0 -0.707108">
+      <inertial pos="0 0 0" mass="12.0" diaginertia="0.20 0.20 0.20"/>
+      <joint class="robot_joint" name="kr20_base_link__link1" axis="0 0 1"
+            range="-3.22886 3.22886"/>
+      <geom class="col" pos="0 0 0.551" quat="1 0 0 0" type="mesh" mesh="kr20_asse1" material="kr20_mtl"/>
+
+      <body name="kr20_link2" pos="0.16 0 1.071">
+        <inertial pos="0 0 0" mass="8.0" diaginertia="0.15 0.15 0.10"/>
+        <joint class="robot_joint" name="kr20_link1__link2" axis="0 1 0"
+              range="-1.65806 2.70526"/>
+        <geom class="col" pos="-0.16 0 -0.52" quat="1 0 0 0" type="mesh" mesh="kr20_asse2" material="kr20_mtl"/>
+
+        <body name="kr20_link3" pos="0 0 0.78">
+          <inertial pos="0 0 0" mass="6.0" diaginertia="0.08 0.08 0.06"/>
+          <joint class="robot_joint" name="kr20_link2__link3" axis="0 1 0"
+                range="-3.97935 1.48353"/>
+          <geom class="col" pos="-0.16 0 -1.3" quat="1 0 0 0" type="mesh" mesh="kr20_asse3" material="kr20_mtl"/>
+
+          <body name="kr20_link4" pos="0.233 0 0.15">
+            <inertial pos="0 0 0" mass="4.0" diaginertia="0.05 0.05 0.04"/>
+            <joint class="robot_joint" name="kr20_link3__link4" axis="1 0 0"
+                  range="-6.10865 6.10865"/>
+            <geom class="col" pos="-0.393 0 -1.45" quat="1 0 0 0" type="mesh" mesh="kr20_asse4" material="kr20_mtl"/>
+
+            <body name="kr20_link5" pos="0.627 0 0">
+              <inertial pos="0 0 0" mass="3.0" diaginertia="0.03 0.03 0.02"/>
+              <joint class="robot_joint" name="kr20_link4__link5" axis="0 1 0"
+                    range="-2.26893 2.26893"/>
+              <geom class="col" pos="-1.02 0 -1.45" quat="1 0 0 0" type="mesh" mesh="kr20_asse5" material="kr20_mtl"/>
+
+              <body name="kr20_flange" pos="0.153 0 0">
+                <inertial pos="0 0 0" mass="2.0" diaginertia="0.02 0.02 0.015"/>
+                <joint class="robot_joint" name="kr20_link5__flange" axis="1 0 0"
+                      range="-6.10865 6.10865"/>
+                <geom class="col" pos="-1.246 0 -1.45" quat="1 0 0 0" type="mesh" mesh="kr20_flange" material="kr20_mtl"/>
+                <geom class="col" pos="0.066 0 0" quat="0.499998 -0.500002 0.5 0.5" type="mesh" mesh="kr20_polso"  material="kr20_mtl"/>
+
+                <!-- KR20 slide (tool extension) -->
+                <body name="kr20_slide" pos="0.299605 0 -0.252354">
+                  <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
+                  <joint class="robot_slider" name="kr20_fixed_slide_joint" axis="0 0 1"
+                        range="-0.05121 0.013863"/>
+                  <geom class="col" pos="-0.09159 0 0.252354" quat="0.499998 -0.5 -0.5 -0.500002" type="mesh" mesh="kr20_slide" material="kr20_mtl"/>
+                </body>
+
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+
+    <!-- KR120 -->
+        <!-- KR120 -->
+    <body name="kr120_link1" pos="1.59 -1.43 0" quat="0.707105 0 0 0.707108">
+      <joint class="robot_joint" name="kr120_base_link__link1" pos="0 0 0" axis="0 0 1" range="-3.22886 3.22886"/>
+      <geom class="col" pos="0 0 0.529" quat="1 0 0 0" type="mesh" mesh="kr120_asse1" material="kr120_mtl"/>
+
+      <body name="kr120_link2" pos="0.33 0 1.174">
+        <joint class="robot_joint" name="kr120_link1__link2" pos="0 0 0" axis="0 1 0" range="-0.872665 1.48353"/>
+        <geom class="col" pos="-0.33 0 -0.645" quat="1 0 0 0" type="mesh" mesh="kr120_asse2" material="kr120_mtl"/>
+
+        <body name="kr120_link3" pos="0 0 1.15">
+          <joint class="robot_joint" name="kr120_link2__link3" pos="0 0 0" axis="0 1 0" range="-3.66519 1.27409"/>
+          <geom class="col" pos="-0.33 0 -1.795" quat="1 0 0 0" type="mesh" mesh="kr120_asse3" material="kr120_mtl"/>
+
+          <body name="kr120_link4" pos="0.367 0 0.115">
+            <joint class="robot_joint" name="kr120_link3__link4" pos="0 0 0" axis="1 0 0" range="-6.10865 6.10865"/>
+            <geom class="col" pos="-0.697 0 -1.91" quat="1 0 0 0" type="mesh" mesh="kr120_asse4" material="kr120_mtl"/>
+
+            <body name="kr120_link5" pos="0.853 0 0">
+              <joint class="robot_joint" name="kr120_link4__link5" pos="0 0 0" axis="0 1 0" range="-2.18166 2.18166"/>
+              <geom class="col" pos="-1.55 0 -1.91" quat="1 0 0 0" type="mesh" mesh="kr120_asse5" material="kr120_mtl"/>
+
+              <body name="kr120_flange" pos="0.215 0 0">
+                <joint class="robot_joint" name="kr120_link5__flange" pos="0 0 0" axis="1 0 0" range="-6.10865 6.10865"/>
+                <geom class="col" pos="-1.765 0 -1.91" quat="1 0 0 0" type="mesh" mesh="kr120_flange" material="kr120_mtl"/>
+                <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_slider" material="kr120_mtl"/>
+
+                <!-- Left finger -->
+                <body name="kr120_pinza_left">
+                  <joint class="robot_slider" name="kr120_pinza_left_joint" pos="0 0 0" axis="0 1 0" range="0 0.0355"/>
+                  <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_left" material="kr120_mtl"/>
+
+                  <body name="kr120_gyro_left" pos="0.597 0 0">
+                    <joint name="kr120_gyro_left_joint" pos="0 0 0" axis="0 1 0" range="-3.1415 3.1415"/>
+                    <geom class="col" pos="-0.597 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_gyro_left" material="kr120_mtl"/>
+                    <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+                  </body>
+
+                  <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+                </body>
+
+                <!-- Right finger -->
+                <body name="kr120_pinza_right">
+                  <joint class="robot_slider" name="kr120_pinza_right_joint" pos="0 0 0" axis="0 1 0" range="-0.0355 0"/>
+                  <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_right" material="kr120_mtl"/>
+
+                  <body name="kr120_gyro_right" pos="0.597 0 0">
+                    <joint name="kr120_gyro_right_joint" pos="0 0 0" axis="0 -1 0" range="-3.1415 3.1415"/>
+                    <geom class="col" pos="-0.597 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_gyro_right" material="kr120_mtl"/>
+                    <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+                  </body>
+
+                  <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+                </body>
+
+                <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+              </body>
+
+              <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+            </body>
+
+            <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+          </body>
+
+          <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+        </body>
+
+        <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+      </body>
+
+      <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+    </body>
+
+
+    <!-- CONVEYOR / LIFTER (ENV) -->
+    <body name="rl_lifter" pos="0 -1.43 0.01">
+      <joint name="rl_base__lifter" pos="0 0 0" axis="0 0 1" type="slide" range="0 0.24" actuatorfrcrange="-100 100" damping="20.0"/>
+      <geom class="env" pos="-0.3455 0 -0.02" quat="0.499998 0.5 0.500002 0.5" type="mesh" mesh="rl_lifter" material="col_mtl"/>
+      <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+    </body>
+
+    <body name="rl_slider" pos="0 -1.43 0.01">
+      <joint name="rl_base__slider" pos="0 0 0" axis="1 0 0" type="slide" range="-1.031 0" actuatorfrcrange="-100 100" damping="20.0"/>
+      <!-- tiny helper removed (or keep as vis if you really want it):
+           <geom class="vis" type="box" size="5e-05 5e-05 5e-05" pos="0 0 0.473"/> -->
+      <body name="rl_plate">
+        <joint name="rl_slider__plate" pos="0 0 0" axis="0 0 1" range="0 6.28319" actuatorfrcrange="-100 100"/>
+        <geom class="env" pos="0 0 0.473" quat="1 0 0 0" type="mesh" mesh="rl_piastra" material="col_mtl"/>
+        <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+      </body>
+      <inertial pos="0 0 0" mass="3.0" diaginertia="0.05000 0.05000 0.05000"/>
+    </body>
+  </worldbody>
+  <!-- =========================================================
+     ACTUATORS (Panda-style: explicit position/velocity)
+     ========================================================= -->
+
+
+<!-- Optional: symmetric gripper coupling (Panda-style) -->
+<tendon>
+  <fixed name="kr120_fingers_split">
+    <joint joint="kr120_pinza_left_joint"  coef="0.5"/>
+    <joint joint="kr120_pinza_right_joint" coef="0.5"/>
+  </fixed>
+</tendon>
+<equality>
+  <joint joint1="kr120_pinza_left_joint" joint2="kr120_pinza_right_joint"
+         solimp="0.95 0.99 0.001" solref="0.005 1"/>
+</equality>
+</mujoco>
+
+
+ -->
+
+
+
+<!-- <actuator>
+  <!-- KR20: 6R + slide -->
+  <position name="kr20_j1" joint="kr20_base_link__link1" kp="250" ctrlrange="-3.22886 3.22886" forcerange="-200 200"/>
+  <position name="kr20_j2" joint="kr20_link1__link2"    kp="250" ctrlrange="-1.65806 2.70526" forcerange="-200 200"/>
+  <position name="kr20_j3" joint="kr20_link2__link3"    kp="250" ctrlrange="-3.97935 1.48353" forcerange="-200 200"/>
+  <position name="kr20_j4" joint="kr20_link3__link4"    kp="200" ctrlrange="-6.10865 6.10865" forcerange="-180 180"/>
+  <position name="kr20_j5" joint="kr20_link4__link5"    kp="200" ctrlrange="-2.26893 2.26893" forcerange="-160 160"/>
+  <position name="kr20_j6" joint="kr20_link5__flange"   kp="150" ctrlrange="-6.10865 6.10865" forcerange="-140 140"/>
+  <position name="kr20_slide" joint="kr20_fixed_slide_joint" kp="400" ctrlrange="-0.05121 0.013863" forcerange="-400 400"/>
+
+  <!-- KR120: 6R -->
+  <position name="kr120_j1" joint="kr120_base_link__link1" kp="300" ctrlrange="-3.22886 3.22886" forcerange="-240 240"/>
+  <position name="kr120_j2" joint="kr120_link1__link2"     kp="300" ctrlrange="-0.872665 1.48353" forcerange="-240 240"/>
+  <position name="kr120_j3" joint="kr120_link2__link3"     kp="260" ctrlrange="-3.66519 1.27409" forcerange="-220 220"/>
+  <position name="kr120_j4" joint="kr120_link3__link4"     kp="220" ctrlrange="-6.10865 6.10865" forcerange="-200 200"/>
+  <position name="kr120_j5" joint="kr120_link4__link5"     kp="200" ctrlrange="-2.18166 2.18166" forcerange="-180 180"/>
+  <position name="kr120_j6" joint="kr120_link5__flange"    kp="170" ctrlrange="-6.10865 6.10865" forcerange="-160 160"/>
+
+  <!-- KR120 gripper + gyros -->
+  <position name="pinza_left"  joint="kr120_pinza_left_joint"  kp="800" ctrlrange="0 0.0355"  forcerange="-800 800"/>
+  <position name="pinza_right" joint="kr120_pinza_right_joint" kp="800" ctrlrange="-0.0355 0" forcerange="-800 800"/>
+  <velocity name="gyro_left"   joint="kr120_gyro_left_joint"   kv="2.0"  forcerange="-1000 1000"/>
+  <velocity name="gyro_right"  joint="kr120_gyro_right_joint"  kv="2.0"  forcerange="-1000 1000"/>
+
+  <!-- RL lifter/slider/plate -->
+  <position name="rl_lifter" joint="rl_base__lifter" kp="400" ctrlrange="0 0.24" forcerange="-400 400"/>
+  <position name="rl_slider" joint="rl_base__slider" kp="400" ctrlrange="-1.031 0" forcerange="-400 400"/>
+  <velocity name="rl_plate"  joint="rl_slider__plate" kv="2.0" forcerange="-100 100"/>
+</actuator> -->
+
+
+<!-- 
+
+

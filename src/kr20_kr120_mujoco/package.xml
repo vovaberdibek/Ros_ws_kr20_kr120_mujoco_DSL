@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>kr20_kr120_mujoco</name>
+  <version>0.0.1</version>
+  <description>Launch files and MJCF models for KUKA KR20 + KR120 using MuJoCo and ros2_control.</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <!-- Build system -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Run-time deps (launch-only package) -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>mujoco_ros2_control</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
