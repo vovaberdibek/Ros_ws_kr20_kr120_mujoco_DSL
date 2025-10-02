@@ -16,6 +16,9 @@ controller_manager:
     kr120_gripper_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
+    kr120_gyro_velocity_controller:
+      type: "forward_command_controller/ForwardCommandController"
+
 # ---- Per-controller parameters (must be separate node sections) ----
 kr20_arm_controller:
   ros__parameters:
@@ -54,6 +57,12 @@ kr120_gripper_controller:
     constraints:
       goal_time: 0.5
       stopped_velocity_tolerance: 0.1
+
+kr120_gyro_velocity_controller:
+  ros__parameters:
+    joints: [kr120_gyro_left_joint, kr120_gyro_right_joint]
+    interface_name: velocity
+
 
 
 # controller_manager:

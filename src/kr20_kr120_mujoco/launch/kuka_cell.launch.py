@@ -69,5 +69,14 @@ def generate_launch_description():
         arguments=['kr120_gripper_controller', '--controller-manager', '/controller_manager'],
         output='screen')]
     )
+    spawner_gyro_vel = TimerAction(
+    period=4.5,
+    actions=[Node(
+        package='controller_manager', executable='spawner',
+        arguments=['kr120_gyro_velocity_controller', '--controller-manager', '/controller_manager'],
+        output='screen')]
+    )
 
-    return LaunchDescription([rsp, mujoco, spawn_js, spawn_kr20, spawn_kr120, spawn_kr120_gripper])
+
+
+    return LaunchDescription([rsp, mujoco, spawn_js, spawn_kr20, spawn_kr120, spawn_kr120_gripper, spawner_gyro_vel])

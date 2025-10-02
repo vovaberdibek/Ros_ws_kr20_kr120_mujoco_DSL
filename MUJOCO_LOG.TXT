@@ -53,3 +53,235 @@ ERROR: Load model error: ParseXML: Error opening file '/home/user/Desktop/ros2_w
 Tue Sep 30 11:31:02 2025
 ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/kr20_basement.obj': No such file or directory
 
+Wed Oct  1 11:36:59 2025
+ERROR: Load model error: XML parse error 6:
+Error=XML_ERROR_PARSING_ELEMENT ErrorID=6 (0x6) Line number=176
+
+
+Wed Oct  1 11:40:14 2025
+ERROR: Load model error: Error: material 'kr120_mtl' not found in geom 20
+Element name '', id 20, line 171
+
+Wed Oct  1 11:40:41 2025
+ERROR: Load model error: Error: material 'kr120_mtl' not found in geom 20
+Element name '', id 20, line 171
+
+Wed Oct  1 11:47:50 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 7. The simulation is unstable. Time = 2.8450.
+
+Wed Oct  1 11:48:15 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 7. The simulation is unstable. Time = 2.8400.
+
+Wed Oct  1 12:02:09 2025
+ERROR: Load model error: Error: repeated name 'kr120_gyro_left' in body
+
+Wed Oct  1 12:10:39 2025
+ERROR: Load model error: Error: mass and inertia of moving bodies must be larger than mjMINVAL
+Element name 'kr120_pinza_left', id 16, line 181
+
+Wed Oct  1 12:16:15 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=82: XMLElement name=worldbody
+
+
+Wed Oct  1 12:24:04 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=82: XMLElement name=worldbody
+
+
+Wed Oct  1 14:31:25 2025
+ERROR: Load model error: Error: axis too small in joint
+Element name 'kr120_gyro_left_joint', id 14, line 185
+
+Wed Oct  1 15:39:04 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 6. The simulation is unstable. Time = 0.0010.
+
+Wed Oct  1 15:39:30 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 6. The simulation is unstable. Time = 0.0010.
+
+Wed Oct  1 15:41:11 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.1080.
+
+Wed Oct  1 15:43:12 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.1080.
+
+Wed Oct  1 15:46:13 2025
+ERROR: Load model error: Error: material 'env_mtl' not found in geom 2
+Element name '', id 2, line 97
+
+Wed Oct  1 15:47:02 2025
+ERROR: Load model error: Error: material 'env_mtl' not found in geom 2
+Element name 'pareti', id 2, line 97
+
+Wed Oct  1 15:47:21 2025
+ERROR: Load model error: Error: material 'env_mtl' not found in geom 2
+Element name '', id 2, line 97
+
+Wed Oct  1 15:50:39 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.1080.
+
+Wed Oct  1 15:54:55 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.1080.
+
+Wed Oct  1 16:02:07 2025
+ERROR: Load model error: Error: repeated name 'fence_vis' in geom
+
+Wed Oct  1 16:02:29 2025
+ERROR: Load model error: Error: repeated name 'fence_vis' in geom
+
+Wed Oct  1 16:03:13 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.1200.
+
+Wed Oct  1 16:05:10 2025
+ERROR: Load model error: Error: mesh geom 'tavolo' (id = 1) must have valid meshid
+Element name 'tavolo', id 1, line 95
+
+Wed Oct  1 16:06:22 2025
+ERROR: Load model error: Error: mesh geom 'tavolo' (id = 1) must have valid meshid
+Element name 'tavolo', id 1, line 95
+
+Wed Oct  1 16:06:56 2025
+ERROR: Load model error: Error: mesh geom 'tavolo' (id = 1) must have valid meshid
+Element name 'tavolo', id 1, line 95
+
+Wed Oct  1 16:08:14 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 0.1200.
+
+Wed Oct  1 16:12:41 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 0.1670.
+
+Wed Oct  1 16:21:23 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 83
+
+Wed Oct  1 16:23:43 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 83
+
+Wed Oct  1 16:28:33 2025
+ERROR: Load model error: Error: repeated name 'tavolo_vis' in geom
+
+Wed Oct  1 16:30:48 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'class'
+Element 'geom', line 40
+
+
+Wed Oct  1 16:42:06 2025
+ERROR: Load model error: XML Error: attribute 'rgba' does not have enough data
+Element 'material', line 85
+
+
+Wed Oct  1 16:42:32 2025
+ERROR: Load model error: XML Error: attribute 'rgba' does not have enough data
+Element 'material', line 85
+
+
+Wed Oct  1 16:42:53 2025
+ERROR: Load model error: XML Error: attribute 'rgba' does not have enough data
+Element 'material', line 85
+
+
+Thu Oct  2 09:33:54 2025
+ERROR: Load model error: Error: repeated name 'groundplane' in texture
+
+Thu Oct  2 09:34:39 2025
+ERROR: Load model error: Error: repeated name 'groundplane' in texture
+
+Thu Oct  2 10:02:56 2025
+ERROR: Load model error: Error: repeated name 'table' in geom
+
+Thu Oct  2 10:10:17 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 103
+
+Thu Oct  2 11:07:22 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 103
+
+Thu Oct  2 11:07:45 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 103
+
+Thu Oct  2 11:08:19 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 101
+
+Thu Oct  2 11:08:47 2025
+ERROR: Load model error: Error: material 'groundplane' not found in geom 0
+Element name 'floor', id 0, line 103
+
+Thu Oct  2 11:10:10 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:13:43 2025
+ERROR: Load model error: Error: mesh 'tray' not found in geom 9
+Element name 'tray_geom', id 9, line 181
+
+Thu Oct  2 11:14:35 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:17:30 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:18:00 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:18:24 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:18:44 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:21:40 2025
+ERROR: Load model error: Error: Error opening file '/home/user/Desktop/ros2_ws/install/share/kr20_kr120_description/mujoco/scenes/../assets/tray.stl': No such file or directory
+
+Thu Oct  2 11:34:24 2025
+ERROR: Load model error: XML Error: required attribute missing: 'pos'
+Element 'inertial', line 190
+
+
+Thu Oct  2 11:35:02 2025
+ERROR: Load model error: Error: mass and inertia of moving bodies must be larger than mjMINVAL
+Element name 'tray', id 1, line 185
+
+Thu Oct  2 11:39:17 2025
+ERROR: Load model error: XML Error: required attribute missing: 'pos'
+Element 'inertial', line 186
+
+
+Thu Oct  2 12:00:12 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 20. The simulation is unstable. Time = 55.2210.
+
+Thu Oct  2 12:00:49 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 15. The simulation is unstable. Time = 3.5080.
+
+Thu Oct  2 12:01:16 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 13. The simulation is unstable. Time = 5.7430.
+
+Thu Oct  2 12:01:54 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 13. The simulation is unstable. Time = 5.3350.
+
+Thu Oct  2 12:03:36 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 20. The simulation is unstable. Time = 6.8890.
+
+Thu Oct  2 12:05:43 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 13. The simulation is unstable. Time = 38.7220.
+
+Thu Oct  2 12:23:34 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 16. The simulation is unstable. Time = 28.9270.
+
+Thu Oct  2 13:57:45 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 16. The simulation is unstable. Time = 12.7630.
+
+Thu Oct  2 14:16:37 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 18. The simulation is unstable. Time = 8.2430.
+
+Thu Oct  2 14:25:15 2025
+ERROR: Load model error: XML parse error 6:
+Error=XML_ERROR_PARSING_ELEMENT ErrorID=6 (0x6) Line number=293
+
+
+Thu Oct  2 14:36:16 2025
+ERROR: Load model error: Error: mesh 'gyro_right_vis_mesh' not found in geom 27
+Element name 'gyro_right_vis', id 27, line 306
+
