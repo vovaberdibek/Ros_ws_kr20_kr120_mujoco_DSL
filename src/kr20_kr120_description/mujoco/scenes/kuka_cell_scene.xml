@@ -2,7 +2,13 @@
 <mujoco model="kuka_cell">
   <compiler angle="radian" inertiafromgeom="false" autolimits="true" meshdir="../assets"/>
   <option gravity="0 0 -9.81" integrator="implicitfast" timestep="0.001"
-          cone="pyramidal" jacobian="dense" iterations="80" tolerance="1e-9"/>
+        cone="pyramidal" jacobian="dense" iterations="80" tolerance="1e-9"
+        noslip_iterations="8" noslip_tolerance="1e-9"/>
+  <size nconmax="4096" njmax="8000"/>
+
+
+  <!-- <option gravity="0 0 -9.81" integrator="implicitfast" timestep="0.001"
+          cone="pyramidal" jacobian="dense" iterations="80" tolerance="1e-9"/> -->
   <visual>
     <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
     <rgba haze="0.15 0.25 0.35 1"/>
@@ -111,6 +117,21 @@
    
 
   </asset>
+  <contact>
+  <!-- Fingers ↔ tray -->
+  <pair geom1="pinza_left_col"  geom2="tray_geom"
+        condim="6" margin="0.002" solref="0.003 2.0" solimp="0.95 0.99 0.001"/>
+  <pair geom1="pinza_right_col" geom2="tray_geom"
+        condim="6" margin="0.002" solref="0.003 2.0" solimp="0.95 0.99 0.001"/>
+
+  <!-- Gyros ↔ tray -->
+  <pair geom1="gyro_left_col"   geom2="tray_geom"
+        condim="6" margin="0.002" solref="0.003 2.0" solimp="0.95 0.99 0.001"/>
+  <pair geom1="gyro_right_col"  geom2="tray_geom"
+        condim="6" margin="0.002" solref="0.003 2.0" solimp="0.95 0.99 0.001"/>
+  </contact>
+
+
 
   <worldbody>
     <light name="fill" pos="2 -2 3" dir="-1 1 -2" directional="true" diffuse="0.8 0.8 0.8"/>
@@ -182,16 +203,14 @@
           quat="0.707105 0 0 0.707108"/>
 
     <body name="tray" pos="1.0 0.18 1.12" euler="0 0 -1.570796">
-      <joint type="free" damping="2.0"/>  <!-- was <freejoint/> -->
-      <inertial pos="0 0 0" mass="1.0" diaginertia="0.004 0.006 0.010"/>
+    <joint type="free" damping="2.0"/>
+    <inertial pos="0 0 0" mass="1.0" diaginertia="0.004 0.006 0.010"/>
 
-      <!-- Use spin+roll friction, tiny margin, slightly “stickier” contact -->
-      <geom name="tray_geom" type="mesh" mesh="tray"
-            condim="6" friction="1.8 1.01 0.002"
-            margin="0.0005" solimp="0.95 0.99 0.001" solref="0.004 1.5"
-            contype="1" conaffinity="3"  
-            material="tray_mtl"/>
-    </body>
+    <geom name="tray_geom" type="mesh" mesh="tray"
+          condim="6" friction="1.8 0.02 0.002"
+          margin="0.0025" solimp="0.95 0.99 0.001" solref="0.003 1.8"
+          contype="1" conaffinity="3" material="tray_mtl"/>
+  </body>
 
 
 
@@ -278,7 +297,10 @@
                   <body name="kr120_pinza_left">
                     <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
                     <joint class="robot_slider" name="kr120_pinza_left_joint" axis="0 1 0" range="0 0.0355"/>
-                    <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_left"/>
+                    <geom name="pinza_left_col" class="col" type="mesh" mesh="kr120_pinza_left"
+                          pos="0 0 0" quat="0.707105 0 0 0.707108"
+                          condim="6" friction="1.6 0.02 0.002" margin="0.002"/>
+
                     
                     <!-- Inside: <body name="kr120_pinza_left"> ... -->
                       <body name="kr120_gyro_left" pos="0.0 0 0">
@@ -288,21 +310,26 @@
                           <joint name="kr120_gyro_left_joint" type="hinge" axis="0 1 0"
                               pos="+0.597 0 0" 
                               limited="false" damping="1.5" frictionloss="0.2" armature="0.001"/>
-                        <geom class="col" type="mesh" mesh="kr120_gyro_left" pos="0 0 0" quat="0.707105 0 0 0.707108"/>
+                        <geom name="gyro_left_col" class="col" type="mesh" mesh="kr120_gyro_left"
+                              pos="0 0 0" quat="0.707105 0 0 0.707108"
+                              condim="6" friction="1.2 0.02 0.002" margin="0.002"/>
                       </body>
                   </body>
                   <body name="kr120_pinza_right">
                     <inertial pos="0 0 0" mass="1.0" diaginertia="0.01 0.01 0.01"/>
                     <joint class="robot_slider" name="kr120_pinza_right_joint" axis="0 1 0" range="-0.0355 0"/>
-                    <geom class="col" pos="0 0 0" quat="0.707105 0 0 0.707108" type="mesh" mesh="kr120_pinza_right"/>
+                    <geom name="pinza_right_col" class="col" type="mesh" mesh="kr120_pinza_right"
+                          pos="0 0 0" quat="0.707105 0 0 0.707108"
+                          condim="6" friction="1.6 0.02 0.002" margin="0.002"/>
                     <!-- Inside: <body name="kr120_pinza_right"> ... -->
                       <body name="kr120_gyro_right" pos="0.0 0 0">
                         <inertial pos="0 0 0" mass="0.3" diaginertia="0.00020 0.00005 0.00020"/>
                         <!-- Mirror around -Y to match your earlier convention -->
                         <joint name="kr120_gyro_right_joint" type="hinge" axis="0 -1 0"
                               pos="+0.597 0 0"  limited="false" damping="1.5" frictionloss="0.2" armature="0.001"/>
-                        <geom class="col" type="mesh" mesh="kr120_gyro_right"
-                              pos="0 0 0" quat="0.707105 0 0 0.707108"/>
+                        <geom name="gyro_right_col" class="col" type="mesh" mesh="kr120_gyro_right"
+                              pos="0 0 0" quat="0.707105 0 0 0.707108"
+                              condim="6" friction="1.2 0.02 0.002" margin="0.002"/>
                       </body>
 
                   </body>

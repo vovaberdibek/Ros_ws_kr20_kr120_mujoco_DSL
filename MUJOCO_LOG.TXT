@@ -285,3 +285,75 @@ Thu Oct  2 14:36:16 2025
 ERROR: Load model error: Error: mesh 'gyro_right_vis_mesh' not found in geom 27
 Element name 'gyro_right_vis', id 27, line 306
 
+Thu Oct  2 14:53:20 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:05:35 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:08:00 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:13:42 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=116: XMLElement name=worldbody
+
+
+Thu Oct  2 15:23:56 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=116: XMLElement name=worldbody
+
+
+Thu Oct  2 15:25:06 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:25:23 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:25:41 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:25:54 2025
+ERROR: Load model error: XML parse error 14:
+Error=XML_ERROR_MISMATCHED_ELEMENT ErrorID=14 (0xe) Line number=115: XMLElement name=worldbody
+
+
+Thu Oct  2 15:34:46 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 14. The simulation is unstable. Time = 16.7610.
+
+Thu Oct  2 15:36:41 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 19. The simulation is unstable. Time = 14.1850.
+
+Thu Oct  2 15:42:45 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 22. The simulation is unstable. Time = 19.2910.
+
+Thu Oct  2 15:45:54 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 13. The simulation is unstable. Time = 23.8130.
+
+Thu Oct  2 16:17:17 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'priority'
+Element 'pair', line 121
+
+
+Mon Oct  6 11:48:16 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'priority'
+Element 'pair', line 122
+
+
+Mon Oct  6 11:49:54 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'priority'
+Element 'pair', line 122
+
+

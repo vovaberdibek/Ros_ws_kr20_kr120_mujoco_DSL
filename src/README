@@ -1,0 +1,117 @@
+This repo is simulation the kuka robot cell of 2 kuka robots and he rl convayor. 
+Simulation with the mujoco sim ros2 controllers and the moveit2 pkg later on coneecting the Previus DSL codes 
+
+
+relevant CMDS : 
+
+ch kr20_kr120_moveit_config viz.launch.py
+
+
+ros2 launch kr20_kr120_mujoco kuka_cell.launch.py
+
+
+
+ros2 action send_goal   /kr20_arm_controller/follow_joint_trajectory   control_msgs/action/FollowJointTrajectory   "{trajectory: {
+      joint_names: [
+        kr20_base_link__link1,
+        kr20_link1__link2,
+        kr20_link2__link3,
+        kr20_link3__link4,
+        kr20_link4__link5,
+        kr20_link5__flange
+      ],
+      points: [
+        { positions: [0.0, -0.5, 0.5, 0.0, 0.5, 0.0], time_from_start: {sec: 2} },
+        { positions: [0.2, -0.3, 0.3, 0.0, 0.3, 0.0], time_from_start: {sec: 4} }
+      ]
+  }}"
+
+
+
+ros2 action send_goal   /kr120_arm_controller/follow_joint_trajectory   control_msgs/action/FollowJointTrajectory   "{trajectory: {
+      joint_names: [
+        kr120_base_link__link1,
+        kr120_link1__link2,
+        kr120_link2__link3,
+        kr120_link3__link4,
+        kr120_link4__link5,
+        kr120_link5__flange
+      ],
+      points: [
+        { positions: [0.0, -0.4, 0.4, 0.0, 0.4, 0.0], time_from_start: {sec: 2} },
+        { positions: [0.3, -0.2, 0.2, 0.0, 0.2, 0.0], time_from_start: {sec: 4} }
+      ]
+  }}"
+
+
+
+# open
+ros2 action send_goal /kr120_gripper_controller/follow_joint_trajectory \
+control_msgs/action/FollowJointTrajectory \
+"{trajectory: {joint_names: [kr120_pinza_left_joint, kr120_pinza_right_joint],
+ points: [{positions: [0.03, -0.03], time_from_start: {sec: 1}}]}}"
+
+# close
+ros2 action send_goal /kr120_gripper_controller/follow_joint_trajectory \
+control_msgs/action/FollowJointTrajectory \
+"{trajectory: {joint_names: [kr120_pinza_left_joint, kr120_pinza_right_joint],
+ points: [{positions: [0.0, 0.0], time_from_start: {sec: 1}}]}}"
+
+
+
+ros2 action send_goal /kr20_arm_controller/follow_joint_trajectory control_msgs/action/FollowJointTrajectory "{trajectory: {joint_names: [
+  kr20_base_link__link1, kr20_link1__link2, kr20_link2__link3,
+  kr20_link3__link4, kr20_link4__link5, kr20_link5__flange],
+  points: [{positions: [0.0,-0.2,0.25,0.0,0.0,0.0], time_from_start: {sec: 2}}]}}"
+  
+  
+  # spin ~180° then return (adjust numbers to taste)
+ros2 action send_goal /kr20_arm_controller/follow_joint_trajectory \
+control_msgs/action/FollowJointTrajectory \
+"{
+  trajectory: {
+    joint_names: [
+      kr20_base_link__link1, kr20_link1__link2, kr20_link2__link3,
+      kr20_link3__link4, kr20_link4__link5, kr20_link5__flange
+    ],
+    points: [
+      { positions: [0,0,0,0,0,0.0], time_from_start: {sec: 0} },
+      { positions: [0,0,0,0,0, 1.57], time_from_start: {sec: 2} },  # screw-in (≈90°)
+      { positions: [0,0,0,0,0, 0.0], time_from_start: {sec: 4} }    # go back
+    ]
+  }
+}"
+
+
+ros2 topic pub --once /kr120_gyro_velocity_controller/commands std_msgs/msg/Float64MultiArray '{data:[1.0,-1.0]}'
+
+---------------------------------------------------------------------------------
+
+ros2 topic pub --once /kr120_arm_controller/joint_trajectory trajectory_msgs/msg/JointTrajectory "{
+  joint_names: [
+    'kr120_base_link__link1',
+    'kr120_link1__link2',
+    'kr120_link2__link3',
+    'kr120_link3__link4',
+    'kr120_link4__link5',
+    'kr120_link5__flange'
+  ],
+  points: [
+    { positions: [0.33, 0.15, -0.20, 0.00, 1.55, -1.27], time_from_start: {sec: 3} }
+  ]
+}"
+
+
+ros2 topic pub --once /kr120_arm_controller/joint_trajectory trajectory_msgs/msg/JointTrajectory "{
+  joint_names: [
+    'kr120_base_link__link1',
+    'kr120_link1__link2',
+    'kr120_link2__link3',
+    'kr120_link3__link4',
+    'kr120_link4__link5',
+    'kr120_link5__flange'
+  ],
+  points: [
+    { positions: [0.33, 0.10, 0.19, 0.0, 1.35, -1.26], time_from_start: {sec: 3} }
+  ]
+}"
