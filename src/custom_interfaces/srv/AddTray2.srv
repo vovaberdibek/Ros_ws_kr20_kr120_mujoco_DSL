@@ -1,0 +1,5 @@
+string tray_name
+string object_name
+---
+bool success
+string message

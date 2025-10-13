@@ -1,0 +1,4 @@
+string command  # e.g., "pick", "place", "screw"
+---
+bool success
+string message

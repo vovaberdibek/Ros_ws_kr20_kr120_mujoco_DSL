@@ -1,0 +1,5 @@
+int32 index  # The index of the tray
+int32 screw_num  # The num of the screw
+---
+bool success
+string message

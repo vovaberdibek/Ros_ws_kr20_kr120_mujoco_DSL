@@ -1,0 +1,1620 @@
+<sdf version='1.11'>
+  <model name='kr20_kr120'>
+    <joint name='fixed_pareti' type='fixed'>
+      <pose relative_to='__model__'>-0.048500000000000001 -0.54049999999999998 0 -1.5708 -5.5511151231257827e-17 -1.5708</pose>
+      <parent>world</parent>
+      <child>pareti</child>
+    </joint>
+    <link name='pareti'>
+      <pose relative_to='fixed_pareti'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name='pareti_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/pareti.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='pareti_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/pareti.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='fixed_table' type='fixed'>
+      <pose relative_to='__model__'>0 0 0 0 0 0</pose>
+      <parent>world</parent>
+      <child>table</child>
+    </joint>
+    <link name='table'>
+      <pose relative_to='fixed_table'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>1.252 -0.12 0.0040000000000000001 0 0 -1.5708</pose>
+        <mass>100</mass>
+        <inertia>
+          <ixx>0.01</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.01</iyy>
+          <iyz>0</iyz>
+          <izz>0.01</izz>
+        </inertia>
+      </inertial>
+      <collision name='table_collision'>
+        <pose>1.252 -0.12 0.41299999999999998 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1.25 1.2 0.81799999999999995</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='table_collision_1'>
+        <pose>1.3513329999999999 0.29322599999999999 1.1016170000000001 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.040000000000000001 0.14999999999999999 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='table_collision_2'>
+        <pose>1.3513329999999999 -0.025760999999999999 1.1016170000000001 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.040000000000000001 0.14999999999999999 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='table_collision_3'>
+        <pose>0.67219700000000004 -0.025760999999999999 1.1016170000000001 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.040000000000000001 0.14999999999999999 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <collision name='table_collision_4'>
+        <pose>0.67219700000000004 0.29322599999999999 1.1016170000000001 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.040000000000000001 0.14999999999999999 0.01</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name='table_visual'>
+        <pose>1.252 -0.12 0.0040000000000000001 0 0 -1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/tavolo.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='kr120_fixed' type='fixed'>
+      <pose relative_to='__model__'>1.5900000000000001 -1.4299999999999999 0 0 0 1.5708</pose>
+      <parent>world</parent>
+      <child>kr120_basamento</child>
+    </joint>
+    <link name='kr120_basamento'>
+      <pose relative_to='kr120_fixed'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.63249999999999995 -0.97875000000000001 0.26450000000000001 -1.5708 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>2.0883236250000001</ixx>
+          <ixy>0.33459704786185379</ixy>
+          <ixz>-1.238117520964769</ixz>
+          <iyy>2.737261821308024</iyy>
+          <iyz>0.51776523221091231</iyz>
+          <izz>0.96128680369197583</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_basamento_collision'>
+        <pose>-1.2649999999999999 -1.9575 0 -1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_basement.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='kr120_basamento_fixed_joint_lump__kr120_base_link_collision_1'>
+        <pose>0 0 0.52900000000000003 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_base.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_basamento_visual'>
+        <pose>-1.2649999999999999 -1.9575 0 -1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_basement.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='kr120_basamento_fixed_joint_lump__kr120_base_link_visual_1'>
+        <pose>0 0 0.52900000000000003 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_base.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_base_link__link1' type='revolute'>
+      <pose relative_to='kr120_basamento'>0 0 0 0 0 0</pose>
+      <parent>kr120_basamento</parent>
+      <child>kr120_link1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.2288600000000001</lower>
+          <upper>3.2288600000000001</upper>
+          <effort>100</effort>
+          <velocity>2.0943999999999998</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_link1'>
+      <pose relative_to='kr120_base_link__link1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.52900000000000003 0 0 0</pose>
+        <mass>1.5</mass>
+        <inertia>
+          <ixx>0.054147000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.054147000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0018749999999999999</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_link1_collision'>
+        <pose>0 0 0.52900000000000003 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_asse1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_link1_visual'>
+        <pose>0 0 0.52900000000000003 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_asse1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_link1__link2' type='revolute'>
+      <pose relative_to='kr120_link1'>0.33000000000000002 0 1.1739999999999999 0 0 0</pose>
+      <parent>kr120_link1</parent>
+      <child>kr120_link2</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.87266500000000002</lower>
+          <upper>1.48353</upper>
+          <effort>100</effort>
+          <velocity>2.0071300000000001</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_link2'>
+      <pose relative_to='kr120_link1__link2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.33000000000000002 0 -0.64500000000000002 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.48159999999999997</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.48159999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_link2_collision'>
+        <pose>-0.33000000000000002 0 -0.64500000000000002 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_asse2.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_link2_visual'>
+        <pose>-0.33000000000000002 0 -0.64500000000000002 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_asse2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_link2__link3' type='revolute'>
+      <pose relative_to='kr120_link2'>0 0 1.1499999999999999 0 0 0</pose>
+      <parent>kr120_link2</parent>
+      <child>kr120_link3</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-3.6651899999999999</lower>
+          <upper>1.2740899999999999</upper>
+          <effort>100</effort>
+          <velocity>2.0943999999999998</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_link3'>
+      <pose relative_to='kr120_link2__link3'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.33000000000000002 0 -1.7949999999999999 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.48159999999999997</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.48159999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_link3_collision'>
+        <pose>-0.33000000000000002 0 -1.7949999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_asse3.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_link3_visual'>
+        <pose>-0.33000000000000002 0 -1.7949999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_asse3.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_link3__link4' type='revolute'>
+      <pose relative_to='kr120_link3'>0.36699999999999999 0 0.115 0 0 0</pose>
+      <parent>kr120_link3</parent>
+      <child>kr120_link4</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-6.1086499999999999</lower>
+          <upper>6.1086499999999999</upper>
+          <effort>100</effort>
+          <velocity>3.3161299999999998</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_link4'>
+      <pose relative_to='kr120_link3__link4'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.69699999999999995 0 -1.9099999999999999 0 0 0</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.0056499999999999996</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.0056499999999999996</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_link4_collision'>
+        <pose>-0.69699999999999995 0 -1.9099999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_asse4.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_link4_visual'>
+        <pose>-0.69699999999999995 0 -1.9099999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_asse4.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_link4__link5' type='revolute'>
+      <pose relative_to='kr120_link4'>0.85299999999999998 0 0 0 0 0</pose>
+      <parent>kr120_link4</parent>
+      <child>kr120_link5</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.1816599999999999</lower>
+          <upper>2.1816599999999999</upper>
+          <effort>100</effort>
+          <velocity>3.1415899999999999</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_link5'>
+      <pose relative_to='kr120_link4__link5'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-1.55 0 -1.9099999999999999 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.48159999999999997</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.48159999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_link5_collision'>
+        <pose>-1.55 0 -1.9099999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_asse5.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_link5_visual'>
+        <pose>-1.55 0 -1.9099999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_asse5.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_link5__flange' type='revolute'>
+      <pose relative_to='kr120_link5'>0.215 0 0 0 0 0</pose>
+      <parent>kr120_link5</parent>
+      <child>kr120_flange</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-6.1086499999999999</lower>
+          <upper>6.1086499999999999</upper>
+          <effort>100</effort>
+          <velocity>4.5378600000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_flange'>
+      <pose relative_to='kr120_link5__flange'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.88249999999999995 0 -0.95499999999999996 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>2.4056500000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>-1.685575</ixz>
+          <iyy>3.4816625000000001</iyy>
+          <iyz>0</iyz>
+          <izz>2.1392125000000002</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_flange_collision'>
+        <pose>-1.7649999999999999 0 -1.9099999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_flange.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='kr120_flange_fixed_joint_lump__kr120_pinza_connector_collision_1'>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_slider.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_flange_visual'>
+        <pose>-1.7649999999999999 0 -1.9099999999999999 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_flange.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='kr120_flange_fixed_joint_lump__kr120_pinza_connector_visual_1'>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_slider.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_pinza_left_joint' type='prismatic'>
+      <pose relative_to='kr120_flange'>0 0 0 0 0 0</pose>
+      <parent>kr120_flange</parent>
+      <child>kr120_pinza_left</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0.035499999999999997</upper>
+          <effort>500</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_pinza_left'>
+      <pose relative_to='kr120_pinza_left_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.10000000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.10000000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.10000000000000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_pinza_left_collision'>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_pinza_left.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_pinza_left_visual'>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_pinza_left.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_gyro_left_joint' type='revolute'>
+      <pose relative_to='kr120_pinza_left'>0.59699999999999998 0 0 0 0 0</pose>
+      <parent>kr120_pinza_left</parent>
+      <child>kr120_gyro_left</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-3.1415000000000002</lower>
+          <upper>3.1415000000000002</upper>
+          <effort>1000</effort>
+          <velocity>4.5378600000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_gyro_left'>
+      <pose relative_to='kr120_gyro_left_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.59699999999999998 0 0 0 0 1.5708</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.10000000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.10000000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.10000000000000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_gyro_left_collision'>
+        <pose>-0.59699999999999998 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_gyro_left.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_gyro_left_visual'>
+        <pose>-0.59699999999999998 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_gyro_left.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_pinza_right_joint' type='prismatic'>
+      <pose relative_to='kr120_flange'>0 0 0 0 0 0</pose>
+      <parent>kr120_flange</parent>
+      <child>kr120_pinza_right</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-0.035499999999999997</lower>
+          <upper>0</upper>
+          <effort>500</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_pinza_right'>
+      <pose relative_to='kr120_pinza_right_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.10000000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.10000000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.10000000000000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_pinza_right_collision'>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_pinza_right.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_pinza_right_visual'>
+        <pose>0 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_pinza_right.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr120_gyro_right_joint' type='revolute'>
+      <pose relative_to='kr120_pinza_right'>0.59699999999999998 0 0 0 0 0</pose>
+      <parent>kr120_pinza_right</parent>
+      <child>kr120_gyro_right</child>
+      <axis>
+        <xyz>0 -1 0</xyz>
+        <limit>
+          <lower>-3.1415000000000002</lower>
+          <upper>3.1415000000000002</upper>
+          <effort>1000</effort>
+          <velocity>4.5378600000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr120_gyro_right'>
+      <pose relative_to='kr120_gyro_right_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.59699999999999998 0 0 0 0 1.5708</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.10000000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.10000000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.10000000000000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr120_gyro_right_collision'>
+        <pose>-0.59699999999999998 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr120_gyro_right.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr120_gyro_right_visual'>
+        <pose>-0.59699999999999998 0 0 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr120_gyro_right.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_world_fixed' type='fixed'>
+      <pose relative_to='__model__'>0 0 0 0 0 -1.5708</pose>
+      <parent>world</parent>
+      <child>kr20_basamento</child>
+    </joint>
+    <link name='kr20_basamento'>
+      <pose relative_to='kr20_world_fixed'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.082500000000000004 -0.18375 0.27550000000000002 -1.5708 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.25182862499999997</ixx>
+          <ixy>-0.045457611366680563</ixy>
+          <ixz>0.03031858302507448</ixz>
+          <iyy>0.1023898812048044</iyy>
+          <iyz>0.10124589912399259</iyz>
+          <izz>0.1866637437951956</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_basamento_collision'>
+        <pose>0.16500000000000001 -0.36749999999999999 0 -1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_basement.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='kr20_basamento_fixed_joint_lump__kr20_base_link_collision_1'>
+        <pose>0 0 0.55100000000000005 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_base.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_basamento_visual'>
+        <pose>0.16500000000000001 -0.36749999999999999 0 -1.5708 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_basement.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='kr20_basamento_fixed_joint_lump__kr20_base_link_visual_1'>
+        <pose>0 0 0.55100000000000005 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_base.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_base_link__link1' type='revolute'>
+      <pose relative_to='kr20_basamento'>0 0 0 0 0 0</pose>
+      <parent>kr20_basamento</parent>
+      <child>kr20_link1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.2288600000000001</lower>
+          <upper>3.2288600000000001</upper>
+          <effort>100</effort>
+          <velocity>3.4906600000000001</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_link1'>
+      <pose relative_to='kr20_base_link__link1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.55100000000000005 0 0 0</pose>
+        <mass>1.5</mass>
+        <inertia>
+          <ixx>0.054147000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.054147000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0018749999999999999</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_link1_collision'>
+        <pose>0 0 0.55100000000000005 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_asse1.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_link1_visual'>
+        <pose>0 0 0.55100000000000005 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_asse1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_link1__link2' type='revolute'>
+      <pose relative_to='kr20_link1'>0.16 0 1.071 0 0 0</pose>
+      <parent>kr20_link1</parent>
+      <child>kr20_link2</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-1.6580600000000001</lower>
+          <upper>2.70526</upper>
+          <effort>100</effort>
+          <velocity>3.0543300000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_link2'>
+      <pose relative_to='kr20_link1__link2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.16 0 -0.52000000000000002 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.48159999999999997</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.48159999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_link2_collision'>
+        <pose>-0.16 0 -0.52000000000000002 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_asse2.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_link2_visual'>
+        <pose>-0.16 0 -0.52000000000000002 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_asse2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_link2__link3' type='revolute'>
+      <pose relative_to='kr20_link2'>0 0 0.78000000000000003 0 0 0</pose>
+      <parent>kr20_link2</parent>
+      <child>kr20_link3</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-3.9793500000000002</lower>
+          <upper>1.48353</upper>
+          <effort>100</effort>
+          <velocity>3.3161299999999998</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_link3'>
+      <pose relative_to='kr20_link2__link3'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.16 0 -1.3 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.48159999999999997</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.48159999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_link3_collision'>
+        <pose>-0.16 0 -1.3 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_asse3.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_link3_visual'>
+        <pose>-0.16 0 -1.3 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_asse3.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_link3__link4' type='revolute'>
+      <pose relative_to='kr20_link3'>0.23300000000000001 0 0.14999999999999999 0 0 0</pose>
+      <parent>kr20_link3</parent>
+      <child>kr20_link4</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-6.1086499999999999</lower>
+          <upper>6.1086499999999999</upper>
+          <effort>100</effort>
+          <velocity>7.5049200000000003</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_link4'>
+      <pose relative_to='kr20_link3__link4'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.39300000000000002 0 -1.45 0 0 0</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.0056499999999999996</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.0056499999999999996</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_link4_collision'>
+        <pose>-0.39300000000000002 0 -1.45 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_asse4.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_link4_visual'>
+        <pose>-0.39300000000000002 0 -1.45 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_asse4.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_link4__link5' type='revolute'>
+      <pose relative_to='kr20_link4'>0.627 0 0 0 0 0</pose>
+      <parent>kr20_link4</parent>
+      <child>kr20_link5</child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>-2.2689300000000001</lower>
+          <upper>2.2689300000000001</upper>
+          <effort>100</effort>
+          <velocity>7.5049200000000003</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_link5'>
+      <pose relative_to='kr20_link4__link5'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-1.02 0 -1.45 0 0 0</pose>
+        <mass>2</mass>
+        <inertia>
+          <ixx>0.48159999999999997</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0</iyy>
+          <iyz>0</iyz>
+          <izz>0.48159999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_link5_collision'>
+        <pose>-1.02 0 -1.45 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_asse5.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_link5_visual'>
+        <pose>-1.02 0 -1.45 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_asse5.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_link5__flange' type='revolute'>
+      <pose relative_to='kr20_link5'>0.153 0 0 0 0 0</pose>
+      <parent>kr20_link5</parent>
+      <child>kr20_flange</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-6.1086499999999999</lower>
+          <upper>6.1086499999999999</upper>
+          <effort>100</effort>
+          <velocity>10.9956</velocity>
+        </limit>
+        <dynamics>
+          <damping>40</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_flange'>
+      <pose relative_to='kr20_link5__flange'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.35416666666666657 0 -0.48333333333333328 0 0 0</pose>
+        <mass>3</mass>
+        <inertia>
+          <ixx>1.9832666666731651</ixx>
+          <ixy>-1.7690155777597761e-06</ixy>
+          <ixz>-1.293158333333333</ixz>
+          <iyy>3.1776428333268352</iyy>
+          <iyz>1.5696128179302e-25</iyz>
+          <izz>2.2575761666666661</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_flange_collision'>
+        <pose>-1.246 0 -1.45 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_flange.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='kr20_flange_fixed_joint_lump__kr20_wrist_collision_1'>
+        <pose>0.066000000000000003 0 0 -1.5708 1.5707963118937354 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_polso.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='kr20_flange_fixed_joint_lump__kr20_fixed_collision_2'>
+        <pose>0.11749999999999999 0 0 -1.5707926535897929 9.2653589793057297e-05 -9.265358979305723e-05</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_fixed.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_flange_visual'>
+        <pose>-1.246 0 -1.45 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_flange.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='kr20_flange_fixed_joint_lump__kr20_wrist_visual_1'>
+        <pose>0.066000000000000003 0 0 -1.5708 1.5707963118937354 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_polso.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <visual name='kr20_flange_fixed_joint_lump__kr20_fixed_visual_2'>
+        <pose>0.11749999999999999 0 0 -1.5707926535897929 9.2653589793057297e-05 -9.265358979305723e-05</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_fixed.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='kr20_fixed_slide_joint' type='prismatic'>
+      <pose relative_to='kr20_flange'>0.29960500000000001 0 -0.25235400000000002 0 0 0</pose>
+      <parent>kr20_flange</parent>
+      <child>kr20_slide</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.051209999999999999</lower>
+          <upper>0.013863</upper>
+          <effort>100</effort>
+          <velocity>1</velocity>
+        </limit>
+        <dynamics>
+          <damping>10</damping>
+          <friction>10</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='kr20_slide'>
+      <pose relative_to='kr20_fixed_slide_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.091590000000000005 0 0.25235400000000002 1.5707926536057681 -1.5707926536662187 3.1415926535746808</pose>
+        <mass>1</mass>
+        <inertia>
+          <ixx>0.10000000000000001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.10000000000000001</iyy>
+          <iyz>0</iyz>
+          <izz>0.10000000000000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='kr20_slide_collision'>
+        <pose>-0.091590000000000005 0 0.25235400000000002 -1.570796326794897 -1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/kr20_slide.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='kr20_slide_visual'>
+        <pose>-0.091590000000000005 0 0.25235400000000002 -1.570796326794897 -1.5707963267948966 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/kr20_slide.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='rl_fixed' type='fixed'>
+      <pose relative_to='__model__'>0 -1.4299999999999999 0.01 0 0 0</pose>
+      <parent>world</parent>
+      <child>rl_base</child>
+    </joint>
+    <link name='rl_base'>
+      <pose relative_to='rl_fixed'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>9.9999999999999995e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.9999999999999995e-07</iyy>
+          <iyz>0</iyz>
+          <izz>9.9999999999999995e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name='rl_base_collision'>
+        <pose>0.096702999999999997 0 0.65625 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/rl_infrastruttura.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rl_base_visual'>
+        <pose>0.096702999999999997 0 0.65625 0 0 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/rl_infrastruttura.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='rl_base__lifter' type='prismatic'>
+      <pose relative_to='rl_base'>0 0 0 0 0 0</pose>
+      <parent>rl_base</parent>
+      <child>rl_lifter</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0.23999999999999999</upper>
+          <effort>100</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rl_lifter'>
+      <pose relative_to='rl_base__lifter'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>9.9999999999999995e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.9999999999999995e-07</iyy>
+          <iyz>0</iyz>
+          <izz>9.9999999999999995e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name='rl_lifter_collision'>
+        <pose>-0.34549999999999997 0 -0.02 1.5708 -5.5511151231257827e-17 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/rl_lifter.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rl_lifter_visual'>
+        <pose>-0.34549999999999997 0 -0.02 1.5708 -5.5511151231257827e-17 1.5708</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/rl_lifter.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='rl_base__slider' type='prismatic'>
+      <pose relative_to='rl_base'>0 0 0 0 0 0</pose>
+      <parent>rl_base</parent>
+      <child>rl_slider</child>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>-1.0309999999999999</lower>
+          <upper>0</upper>
+          <effort>100</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rl_slider'>
+      <pose relative_to='rl_base__slider'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>9.9999999999999995e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.9999999999999995e-07</iyy>
+          <iyz>0</iyz>
+          <izz>9.9999999999999995e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name='rl_slider_collision'>
+        <pose>0 0 0.47299999999999998 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0001 0.0001 0.0001</size>
+          </box>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rl_slider_visual'>
+        <pose>0 0 0.47299999999999998 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.0001 0.0001 0.0001</size>
+          </box>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <joint name='rl_slider__plate' type='revolute'>
+      <pose relative_to='rl_slider'>0 0 0 0 0 0</pose>
+      <parent>rl_slider</parent>
+      <child>rl_plate</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>6.2831853070000001</upper>
+          <effort>100</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='rl_plate'>
+      <pose relative_to='rl_slider__plate'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>9.9999999999999995e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.9999999999999995e-07</iyy>
+          <iyz>0</iyz>
+          <izz>9.9999999999999995e-07</izz>
+        </inertia>
+      </inertial>
+      <collision name='rl_plate_collision'>
+        <pose>0 0 0.47299999999999998 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/collision/rl_piastra.stl</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='rl_plate_visual'>
+        <pose>0 0 0.47299999999999998 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://kr20_kr120_description/visual/rl_piastra.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>false</gravity>
+    </link>
+    <plugin name='gazebo_grasp_fix' filename='libgazebo_grasp_fix.so'>
+      <arm>
+        <arm_name>kr120_pinza</arm_name>
+        <palm_link>kr120_pinza_right</palm_link>
+        <palm_link>kr120_pinza_left</palm_link>
+        <gripper_link>kr120_gyro_left</gripper_link>
+        <gripper_link>kr120_gyro_right</gripper_link>
+      </arm>
+      <update_rate>50</update_rate>
+      <grip_count_threshold>4</grip_count_threshold>
+      <max_grip_count>25</max_grip_count>
+      <release_tolerance>0.0045</release_tolerance>
+      <disable_collision_on_attach>true</disable_collision_on_attach>
+      <contact_topic>__default_topic__</contact_topic>
+    </plugin>
+    <plugin name='gazebo_ros2_control' filename='libgazebo_ros2_control.so'/>
+    <frame name='kr120_base' attached_to='kr120_basamento'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr120_base_link' attached_to='kr120_base'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr120_pinza_connector_joint' attached_to='kr120_flange'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr120_pinza_connector' attached_to='kr120_pinza_connector_joint'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr20_base' attached_to='kr20_basamento'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr20_base_link' attached_to='kr20_base'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr20_tool_connector_joint' attached_to='kr20_wrist'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr20_fixed' attached_to='kr20_tool_connector_joint'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr20_flange__wrist' attached_to='kr20_flange'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='kr20_wrist' attached_to='kr20_flange__wrist'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+  </model>
+</sdf>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<robot name="kr120" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find-pkg-share kr20_kr120_description)/urdf/kr120_macro.xacro"/>
+  <!-- Replace 'kr120' with the macro name you saw in step 1, pass needed params -->
+  <xacro:kr120 prefix=""/>
+</robot>

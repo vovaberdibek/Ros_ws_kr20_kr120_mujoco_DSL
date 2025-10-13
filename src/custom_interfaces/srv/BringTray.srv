@@ -1,0 +1,4 @@
+string tray_name
+string location
+---
+bool success

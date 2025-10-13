@@ -1,0 +1,27 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 250
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    # two arm controllers in the *same* manager
+    kr20_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    kr120_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+kr20_arm_controller:
+  ros__parameters:
+    # 6 DOF KUKA KR20 (use the exact joint names from your SDF)
+    joints: [kr20_base_link__link1, kr20_link1__link2, kr20_link2__link3,
+             kr20_link3__link4, kr20_link4__link5, kr20_link5__flange]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]
+
+kr120_arm_controller:
+  ros__parameters:
+    # 6 DOF KUKA KR120
+    joints: [kr120_base_link__link1, kr120_link1__link2, kr120_link2__link3,
+             kr120_link3__link4, kr120_link4__link5, kr120_link5__flange]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]

@@ -1,0 +1,4 @@
+int32 index  # The index of the tray
+---
+bool success
+string message

@@ -1,0 +1,138 @@
+
+start: agents_definition locations_definition trays_definition parameters_definition? tray_step_poses_definition? main_poses_definition? assembly_definition
+
+agents_definition: "Agents" ":" agent+
+agent: IDENTIFIER
+
+parameters_definition: "Parameters" ":" parameter+
+parameter: tip_offset
+         | tray_angles
+         | tray_down_steps
+         | rotation_steps
+         | tray_final_pose
+         | tray_pose_operator
+         | rest_pose
+         | pre_pick_pose
+         | post_pick_pose
+         | pre_recharge_pose
+         | pre_end_pose
+         | tray_heights
+         | origin_to_bottom
+         | tray_init_offset
+         | named_pose_entry
+
+
+tip_offset: "TipOffset" ":" vector3
+tray_angles: "TrayAngles" ":" vector2
+tray_down_steps: "TrayDownSteps" ":" int_list
+rotation_steps: "RotationSteps" ":" int_list
+named_pose_entry: IDENTIFIER ":" vector6
+tray_final_pose: "TrayFinalPose" ":" vector6
+tray_pose_operator: "TrayPoseOperator" ":" vector6
+rest_pose: "RestPose" ":" vector6
+pre_pick_pose: "PrePickPose" ":" vector6
+post_pick_pose: "PostPickPose" ":" vector6
+pre_recharge_pose: "PreRechargePose" ":" vector6
+pre_end_pose: "PreEndPose" ":" vector6
+tray_heights: "TrayHeights" ":" float_list
+origin_to_bottom: "OriginToBottomDistances" ":" float_list
+tray_init_offset: "TrayInitOffset" ":" vector2
+
+
+tray_step_poses_definition: "TrayStepPoses" ":" "[" tray_pose_entry ("," tray_pose_entry)* "]"
+tray_pose_entry: vector6
+
+locations_definition: "Locations" ":" location+
+location: IDENTIFIER ":" "{" "position" ":" vector3 "," "orientation" ":" vector3 "}"
+
+main_poses_definition: "MainPoses" ":" main_pose+
+main_pose: IDENTIFIER ":" vector6
+
+trays_definition: "Trays" ":" tray+
+tray: IDENTIFIER ":" "{" tray_attribute* "}"
+
+tray_attribute: tray_line
+              | units_def
+              | screws_def
+              | height_def
+              | initial_pose
+              | operator_pose
+              | final_pose
+
+units_def: "units" ":" "[" unit ("," unit)* "]"
+unit: "{" unit_field ("," unit_field)* "}"
+unit_field: IDENTIFIER ":" unit_value
+
+unit_value: IDENTIFIER
+          | INT
+          | screw_block
+
+screw_block: "{" screw_field ("," screw_field)* "}"
+screw_field: "positions" ":" "[" vector6 ("," vector6)* "]"
+           | "manual_indices" ":" int_list
+           | "auto_indices" ":" int_list
+
+
+tray_line: "tray" ":" IDENTIFIER
+screws_def: "screws" ":" "[" screw ("," screw)* "]"
+screw: INT "x" IDENTIFIER
+height_def: "height" ":" NUMBER
+initial_pose: "initial_pose" ":" vector6
+operator_pose: "operator_pose" ":" vector6
+final_pose: "final_pose" ":" vector6
+
+
+assembly_definition: "Assembly" ":" assembly_command+
+assembly_command: CONTROL_TYPE (add_tray | add_tray2 | pick_tray | operator_position_tray | recharge_sequence | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble) [repeat] [speed]
+
+add_tray: "AddTray" "(" INT ")"
+add_tray2: "AddTray2" "(" STRING ["," STRING] ")"
+operator_position_tray: "OperatorPositionTray" "(" INT ")"
+recharge_sequence: "RechargeSequence" "(" INT ")"
+internal_screwing_sequence: "InternalScrewingSequence" "(" INT ")"
+external_screwing_sequence: "ExternalScrewingSequence" "(" INT ")"
+pick_tray: "PickTray" "(" INT ")"
+place_tray: "PlaceTray" "(" INT ")"
+
+load_tray: "LoadTray" "(" IDENTIFIER "," IDENTIFIER ")"
+bring_tray: "BringTray" "(" IDENTIFIER "," IDENTIFIER "," IDENTIFIER ")"
+position_tray: "PositionTray" "(" INT ")"
+initial_assemble: "InitialAssemble" "(" IDENTIFIER "," IDENTIFIER ")"
+finish_assemble: "FinishAssemble" "(" IDENTIFIER "," IDENTIFIER "," IDENTIFIER ")"
+
+
+repeat: "Repeat" "=" INT
+speed: "Speed" "=" NUMBER
+
+robot: IDENTIFIER "Type" "=" robot_type "Task" "=" STRING "Position" "=" robot_position "Payload" "=" INT "Precision" "=" INT
+robot_type: "MAIN" | "SECONDARY" | "AMR"
+robot_position: "X" "=" NUMBER "Y" "=" NUMBER "Z" "=" NUMBER
+
+capability: "Robot" "=" IDENTIFIER "Action" "=" STRING "Conditions" "{" condition* "}"
+condition: "Type" "=" condition_type "Value" "=" STRING
+condition_type: "TEMPERATURE" | "HUMIDITY" | "PRECISION"
+
+vector2: "[" NUMBER "," NUMBER "]"
+vector3: "[" NUMBER "," NUMBER "," NUMBER "]"
+vector6: "[" NUMBER "," NUMBER "," NUMBER "," NUMBER "," NUMBER "," NUMBER "]"
+int_list: "[" INT ("," INT)* "]"
+float_list: "[" [NUMBER ("," NUMBER)*] [","] "]"
+
+
+%import common.SIGNED_NUMBER
+%import common.INT
+%import common.SIGNED_INT
+
+NUMBER: SIGNED_NUMBER
+
+CONTROL_TYPE: "manual" | "automated" | "supervised"
+IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
+STRING: /"[^"]*"/
+COLON: ":"
+COMMA: ","
+DASH: "-"
+NEWLINE: /\n/
+
+
+%ignore " "
+%ignore /\n/

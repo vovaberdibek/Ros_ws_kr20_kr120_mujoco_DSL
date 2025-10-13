@@ -1,0 +1,35 @@
+float64[] tray_step_poses
+float64[6] tray_final_pose
+float64[6] tray_pose_operator
+# Pose arrays as float64[6] -> [x, y, z, roll, pitch, yaw]
+float64[6] table_pose
+float64[6] tray_init_pose
+float64[6] bottom_init_pose
+float64[6] recharge_pose
+float64[6] rest_pose
+float64[6] pick_pose
+float64[6] pre_pick_pose
+float64[6] post_pick_pose
+float64[6] bottom_pick_pose
+float64[6] end_pose
+float64[6] pre_end_pose
+float64[3] tip_offset
+float64 tray_angle1
+float64 tray_angle2
+float64[] tray_heights
+float64[] origin_to_bottom
+float64[] tray_init_offset
+int32[] tray_down_steps
+int32[] operator_steps
+int32[] rotation_steps
+int32[] new_tray_steps
+
+string[] tray_unit_names
+int32[] tray_unit_pose_indices
+
+int32[] screw_quantities
+string[] screw_types
+
+string new_dummy
+---
+bool success

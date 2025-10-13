@@ -1,0 +1,3 @@
+string task_description  # Input: Task description for confirmation
+---
+bool success             # Output: User's confirmation (yes -> true, no -> false)

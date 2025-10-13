@@ -1,0 +1,16 @@
+# ExecuteSequence.action
+
+# Goal
+string task_name
+int32 tray_index
+int32 start_index
+int32 end_index
+
+---
+# Result
+bool success
+string message
+
+---
+# Feedback
+string progress
