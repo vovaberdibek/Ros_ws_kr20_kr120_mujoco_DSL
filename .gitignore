@@ -14,3 +14,10 @@ __pycache__/
 # IDE/editor
 .vscode/
 .idea/
+
+# Logs / build / ROS2
+Ogre.log
+build/
+install/
+log/
+.colcon*
