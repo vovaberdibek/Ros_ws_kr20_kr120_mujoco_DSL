@@ -79,17 +79,21 @@ MainPoses:
     PreEnd: [0.0, -1.43, 2.582, 0, 1.57, 0]
 
 Assembly:
-    manual AddTray2("tray_aoc", "CMG2") 
+    manual AddTray2("tray_aoc", "MTQ_MAG") 
     manual PickTray(0) 
     manual OperatorPositionTray(0) 
     manual PositionTray(0) 
     manual RechargeSequence(0) 
     manual InternalScrewingSequence(2) 
-    manual AddTray2("tray_aoc", "CMG1") 
-    manual OperatorPositionTray(0) 
-    manual PositionTray(3) 
-    manual RechargeSequence(3) 
-    manual InternalScrewingSequence(3) 
+    manual PlaceTray(0) 
+
+    manual AddTray2("tray_aoc", "CMG34") 
+    manual PickTray(1) 
+    manual OperatorPositionTray(1) 
+    manual PositionTray(1) 
+    manual RechargeSequence(1) 
+    manual InternalScrewingSequence(1) 
+    
     manual AddTray2("tray_aoc", "CMG34") 
     manual OperatorPositionTray(0) 
     manual PositionTray(4) 

@@ -110,6 +110,14 @@ def generate_launch_description():
         output="screen",
     )
 
+    jsp = Node(
+        package="joint_state_publisher_gui",
+        executable="joint_state_publisher_gui",
+        output="screen",
+        parameters=[{"rate": 30.0}],
+    )
+
+
     move_group = Node(
         package="moveit_ros_move_group",
         executable="move_group",
@@ -121,7 +129,7 @@ def generate_launch_description():
             ompl_yaml,
             joint_limits_yaml,
             moveit_controllers_yaml,
-            {"moveit_manage_controllers": True}, 
+            {"moveit_manage_controllers": False}, 
             {"planning_pipelines": ["ompl"]},
         ],
     )
@@ -154,6 +162,7 @@ def generate_launch_description():
         TimerAction(period=2.5, actions=[spawner_kr120]),
         move_group,
         rviz,
+        jsp
     ])
 
 

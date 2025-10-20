@@ -12,7 +12,7 @@ find_package(ament_cmake REQUIRED)
 # find_package(robot_state_publisher REQUIRED)
 
 # Install description resources
-foreach(dir launch config urdf collision materials visual)
+foreach(dir launch config urdf collision materials visual meshes)
   install(DIRECTORY ${dir}/ DESTINATION share/${PROJECT_NAME}/${dir})
 endforeach()
 
@@ -21,3 +21,5 @@ install(DIRECTORY mujoco/ DESTINATION share/${PROJECT_NAME}/mujoco)
 
 
 ament_package()
+
+

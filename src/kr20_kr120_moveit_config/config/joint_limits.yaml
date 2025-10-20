@@ -12,99 +12,84 @@ joint_limits:
     has_velocity_limits: true
     max_velocity: 2.0943999999999998
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
+  kr120_gyro_left_joint:
+    has_velocity_limits: true
+    max_velocity: 4.5378600000000002
+    has_acceleration_limits: false
+    max_acceleration: 0
+  kr120_gyro_right_joint:
+    has_velocity_limits: true
+    max_velocity: 4.5378600000000002
+    has_acceleration_limits: false
+    max_acceleration: 0
   kr120_link1__link2:
     has_velocity_limits: true
     max_velocity: 2.0071300000000001
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr120_link2__link3:
     has_velocity_limits: true
     max_velocity: 2.0943999999999998
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr120_link3__link4:
     has_velocity_limits: true
     max_velocity: 3.3161299999999998
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr120_link4__link5:
     has_velocity_limits: true
     max_velocity: 3.1415899999999999
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr120_link5__flange:
     has_velocity_limits: true
     max_velocity: 4.5378600000000002
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
+  kr120_pinza_left_joint:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: false
+    max_acceleration: 0
+  kr120_pinza_right_joint:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: false
+    max_acceleration: 0
   kr20_base_link__link1:
     has_velocity_limits: true
     max_velocity: 3.4906600000000001
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
+  kr20_fixed_slide_joint:
+    has_velocity_limits: true
+    max_velocity: 1.0
+    has_acceleration_limits: false
+    max_acceleration: 0
   kr20_link1__link2:
     has_velocity_limits: true
     max_velocity: 3.0543300000000002
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr20_link2__link3:
     has_velocity_limits: true
     max_velocity: 3.3161299999999998
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr20_link3__link4:
     has_velocity_limits: true
     max_velocity: 7.5049200000000003
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr20_link4__link5:
     has_velocity_limits: true
     max_velocity: 7.5049200000000003
     has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0
   kr20_link5__flange:
     has_velocity_limits: true
     max_velocity: 10.9956
     has_acceleration_limits: false
-    max_acceleration: 0.0
-    kr20_link1__link2:
-    has_velocity_limits: true
-    max_velocity: 3.05433
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  kr20_link2__link3:
-    has_velocity_limits: true
-    max_velocity: 3.31613
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  kr20_link3__link4:
-    has_velocity_limits: true
-    max_velocity: 7.50492
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  kr20_link4__link5:
-    has_velocity_limits: true
-    max_velocity: 7.50492
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  kr20_link5__flange:
-    has_velocity_limits: true
-    max_velocity: 10.9956
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  rl_base__lifter:
-    has_velocity_limits: true
-    max_velocity: 2.0
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  rl_base__slider:
-    has_velocity_limits: true
-    max_velocity: 2.0
-    has_acceleration_limits: false
-    max_acceleration: 0.0
-  rl_slider__plate:
-    has_velocity_limits: true
-    max_velocity: 2.0
-    has_acceleration_limits: false
-    max_acceleration: 0.0
+    max_acceleration: 0

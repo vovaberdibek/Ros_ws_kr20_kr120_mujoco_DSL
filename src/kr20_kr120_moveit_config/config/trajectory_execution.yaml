@@ -1,0 +1,7 @@
+trajectory_execution:
+  # Allow controller to take up to 2x the planned duration
+  allowed_execution_duration_scaling: 2.0
+  # Plus an extra fixed margin
+  allowed_goal_duration_margin: 2.0    # seconds
+  # Keep monitoring on
+  execution_duration_monitoring: true

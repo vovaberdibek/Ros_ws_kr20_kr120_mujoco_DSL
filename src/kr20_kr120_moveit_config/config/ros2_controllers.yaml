@@ -1,5 +1,4 @@
-
-# # This config file is used by ros2_control
+# This config file is used by ros2_control
 controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
@@ -9,6 +8,14 @@ controller_manager:
 
 
     kr120_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    ee_kr20_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+    ee_kr120_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
 
@@ -24,12 +31,11 @@ kr20_arm_controller:
       - kr20_link3__link4
       - kr20_link4__link5
       - kr20_link5__flange
-    command_interfaces: [position]
-    state_interfaces: [position, velocity]
-    allow_partial_joints_goal: false
-    constraints:
-      stopped_velocity_tolerance: 0.01
-      goal_time: 1.0
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
 kr120_arm_controller:
   ros__parameters:
     joints:
@@ -39,9 +45,31 @@ kr120_arm_controller:
       - kr120_link3__link4
       - kr120_link4__link5
       - kr120_link5__flange
-    command_interfaces: [position]
-    state_interfaces: [position, velocity]
-    allow_partial_joints_goal: false
-    constraints:
-      stopped_velocity_tolerance: 0.01
-      goal_time: 1.0
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+ee_kr20_controller:
+  ros__parameters:
+    joints:
+      - kr20_link5__flange
+      - kr20_fixed_slide_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+ee_kr120_controller:
+  ros__parameters:
+    joints:
+      - kr120_link5__flange
+      - kr120_pinza_left_joint
+      - kr120_gyro_left_joint
+      - kr120_pinza_right_joint
+      - kr120_gyro_right_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity

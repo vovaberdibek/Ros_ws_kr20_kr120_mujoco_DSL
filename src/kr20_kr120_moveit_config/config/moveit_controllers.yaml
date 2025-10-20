@@ -1,16 +1,12 @@
-
-# # MoveIt uses this configuration for controller management
-
 moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
 
 moveit_simple_controller_manager:
   controller_names:
     - kr20_arm_controller
     - kr120_arm_controller
-
   kr20_arm_controller:
     type: FollowJointTrajectory
-    action_ns: follow_joint_trajectory     # -> /kr20_arm_controller/follow_joint_trajectory
+    action_ns: follow_joint_trajectory    # => /kr20_arm_controller/follow_joint_trajectory
     default: true
     joints:
       - kr20_base_link__link1
@@ -19,9 +15,11 @@ moveit_simple_controller_manager:
       - kr20_link3__link4
       - kr20_link4__link5
       - kr20_link5__flange
+
   kr120_arm_controller:
     type: FollowJointTrajectory
-    action_ns: follow_joint_trajectory
+    action_ns: follow_joint_trajectory    # => /kr120_arm_controller/follow_joint_trajectory
+    default: true
     joints:
       - kr120_base_link__link1
       - kr120_link1__link2
@@ -29,3 +27,50 @@ moveit_simple_controller_manager:
       - kr120_link3__link4
       - kr120_link4__link5
       - kr120_link5__flange
+
+
+# MoveIt uses this configuration for controller management
+
+# moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControllerManager
+
+# moveit_simple_controller_manager:
+#   controller_names:
+#     - kr20_arm_controller
+#     - kr120_arm_controller
+#     - ee_kr20_controller
+#     - ee_kr120_controller
+
+#   kr20_arm_controller:
+#     type: FollowJointTrajectory
+#     joints:
+#       - kr20_base_link__link1
+#       - kr20_link1__link2
+#       - kr20_link2__link3
+#       - kr20_link3__link4
+#       - kr20_link4__link5
+#       - kr20_link5__flange
+#     action_ns: follow_joint_trajectory
+#     default: true
+#   kr120_arm_controller:
+#     type: FollowJointTrajectory
+#     joints:
+#       - kr120_base_link__link1
+#       - kr120_link1__link2
+#       - kr120_link2__link3
+#       - kr120_link3__link4
+#       - kr120_link4__link5
+#       - kr120_link5__flange
+#     action_ns: follow_joint_trajectory
+#   ee_kr20_controller:
+#     type: FollowJointTrajectory
+#     joints:
+#       - kr20_link5__flange
+#       - kr20_fixed_slide_joint
+#   ee_kr120_controller:
+#     type: FollowJointTrajectory
+#     joints:
+#       - kr120_link5__flange
+#       - kr120_pinza_left_joint
+#       - kr120_gyro_left_joint
+#       - kr120_pinza_right_joint
+#       - kr120_gyro_right_joint

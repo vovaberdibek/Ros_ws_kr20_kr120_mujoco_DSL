@@ -4,7 +4,7 @@
     A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
 -->
 <robot name="kr20_kr120">
-    <!-- GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+    <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
     <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
     <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
@@ -14,6 +14,20 @@
     </group>
     <group name="kr120_arm">
         <chain base_link="kr120_basamento" tip_link="kr120_flange"/>
+    </group>
+    <group name="ee_kr20">
+        <link name="kr20_flange"/>
+        <link name="kr20_wrist"/>
+        <link name="kr20_fixed"/>
+        <link name="kr20_slide"/>
+    </group>
+    <group name="ee_kr120">
+        <link name="kr120_flange"/>
+        <link name="kr120_pinza_connector"/>
+        <link name="kr120_pinza_left"/>
+        <link name="kr120_gyro_left"/>
+        <link name="kr120_pinza_right"/>
+        <link name="kr120_gyro_right"/>
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
     <group_state name="home" group="kr20_arm">
@@ -32,12 +46,25 @@
         <joint name="kr120_link4__link5" value="0"/>
         <joint name="kr120_link5__flange" value="0"/>
     </group_state>
+    <group_state name="testPosekr_20" group="kr20_arm">
+        <joint name="kr20_base_link__link1" value="-0.5173"/>
+        <joint name="kr20_link1__link2" value="-0.067"/>
+        <joint name="kr20_link2__link3" value="0.397"/>
+        <joint name="kr20_link3__link4" value="1.8562"/>
+        <joint name="kr20_link4__link5" value="0.9652"/>
+        <joint name="kr20_link5__flange" value="1.9237"/>
+    </group_state>
+    <group_state name="testPoseKr120" group="kr120_arm">
+        <joint name="kr120_base_link__link1" value="-0.1605"/>
+        <joint name="kr120_link1__link2" value="0.1688"/>
+        <joint name="kr120_link2__link3" value="0.2098"/>
+        <joint name="kr120_link3__link4" value="3.2062"/>
+        <joint name="kr120_link4__link5" value="-1.3138"/>
+        <joint name="kr120_link5__flange" value="1.1812"/>
+    </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="pinza" parent_link="kr120_flange" group="ee_kr120" parent_group="kr120_arm"/>
     <end_effector name="avvitatore" parent_link="kr20_flange" group="ee_kr20" parent_group="kr20_arm"/>
-    <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="world_to_kr120" type="fixed" parent_frame="world" child_link="kr120_basamento"/>
-    <virtual_joint name="world_to_kr20" type="fixed" parent_frame="world" child_link="kr20_basamento"/>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="kr120_basamento" link2="kr120_base_link" reason="Adjacent"/>
     <disable_collisions link1="kr120_basamento" link2="kr120_link1" reason="Never"/>
@@ -152,6 +179,7 @@
     <disable_collisions link1="kr20_fixed" link2="kr20_link5" reason="Never"/>
     <disable_collisions link1="kr20_fixed" link2="kr20_slide" reason="Adjacent"/>
     <disable_collisions link1="kr20_fixed" link2="kr20_wrist" reason="Adjacent"/>
+    <disable_collisions link1="kr20_fixed" link2="rl_slider" reason="Never"/>
     <disable_collisions link1="kr20_flange" link2="kr20_link2" reason="Never"/>
     <disable_collisions link1="kr20_flange" link2="kr20_link3" reason="Never"/>
     <disable_collisions link1="kr20_flange" link2="kr20_link5" reason="Adjacent"/>
@@ -178,6 +206,7 @@
     <disable_collisions link1="kr20_link4" link2="rl_slider" reason="Never"/>
     <disable_collisions link1="kr20_link5" link2="kr20_slide" reason="Never"/>
     <disable_collisions link1="kr20_link5" link2="kr20_wrist" reason="Default"/>
+    <disable_collisions link1="kr20_link5" link2="rl_slider" reason="Never"/>
     <disable_collisions link1="kr20_slide" link2="kr20_wrist" reason="Never"/>
     <disable_collisions link1="kr20_slide" link2="rl_slider" reason="Never"/>
     <disable_collisions link1="kr20_wrist" link2="rl_slider" reason="Never"/>
@@ -190,14 +219,9 @@
     <disable_collisions link1="rl_base" link2="rl_plate" reason="Default"/>
     <disable_collisions link1="rl_base" link2="rl_slider" reason="Adjacent"/>
     <disable_collisions link1="rl_base" link2="table" reason="Adjacent"/>
+    <disable_collisions link1="rl_lifter" link2="rl_plate" reason="Always"/>
     <disable_collisions link1="rl_lifter" link2="table" reason="Never"/>
     <disable_collisions link1="rl_plate" link2="rl_slider" reason="Adjacent"/>
     <disable_collisions link1="rl_plate" link2="table" reason="Never"/>
     <disable_collisions link1="rl_slider" link2="table" reason="Never"/>
-  <group name="ee_kr20">
-    <link name="kr20_flange"/>
-  </group>
-  <group name="ee_kr120">
-    <link name="kr120_flange"/>
-  </group>
 </robot>
