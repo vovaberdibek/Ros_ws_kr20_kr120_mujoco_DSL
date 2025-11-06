@@ -22,6 +22,7 @@ setup(
             'ros_http_bridge = ros_http_bridge2.ros_http_bridge_rclpy:main',
             'confirm_server  = ros_http_bridge2.confirmation_service_rclpy:main',
             'dsl_main        = ros_http_bridge2.main:main',
+            'mock_servers    = ros_http_bridge2.mock_servers:main',   
         ],
     },
 )

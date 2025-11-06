@@ -9,7 +9,7 @@ def main():
         grammar = f.read()
 
     # Adjust the path of your workflow file as you like, or accept text via CLI later
-    workflow_path = "/home/user/ros2_ws/src/ros_http_bridge2/ros_http_bridge2/workflows/workflow.workflow"
+    workflow_path = "/home/user/ros2_ws/src/ros_http_bridge2/ros_http_bridge2/workflow.workflow"
 
     with open(workflow_path, "r") as wf:
         workflow_text = wf.read()

@@ -83,12 +83,13 @@ final_pose: "final_pose" ":" vector6
 
 
 assembly_definition: "Assembly" ":" assembly_command+
-assembly_command: CONTROL_TYPE (add_tray | add_tray2 | pick_tray | operator_position_tray | recharge_sequence | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble) [repeat] [speed]
+assembly_command: CONTROL_TYPE (add_tray | add_tray2 | pick_tray | operator_position_tray | recharge_sequence | internal_screw_by_num | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble) [repeat] [speed]
 
 add_tray: "AddTray" "(" INT ")"
 add_tray2: "AddTray2" "(" STRING ["," STRING] ")"
 operator_position_tray: "OperatorPositionTray" "(" INT ")"
 recharge_sequence: "RechargeSequence" "(" INT ")"
+internal_screw_by_num: "InternalScrewByNum" "(" INT "," INT ")"
 internal_screwing_sequence: "InternalScrewingSequence" "(" INT ")"
 external_screwing_sequence: "ExternalScrewingSequence" "(" INT ")"
 pick_tray: "PickTray" "(" INT ")"

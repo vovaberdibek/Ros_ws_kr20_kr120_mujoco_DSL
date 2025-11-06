@@ -1,0 +1,11 @@
+digraph G {
+"base_link" -> "camera"[label=" Broadcaster: default_authority\nAverage rate: 13.745\nBuffer length: 10.04\nMost recent transform: 1502.272\nOldest transform: 1492.232\n"];
+"world" -> "red_cube"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"camera" -> "camera_optical_frame"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "green_sphere"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "red_box"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1761044090.6719723"[ shape=plaintext ] ;
+}->"base_link";
+}

@@ -27,7 +27,7 @@ def generate_launch_description():
 
     robot_description = {
         "robot_description": ParameterValue(
-            Command(["xacro ", robot_xacro]),  # no stray space after 'xacro'
+            Command(["xacro", " ", robot_xacro]),
             value_type=str,
         )
     }

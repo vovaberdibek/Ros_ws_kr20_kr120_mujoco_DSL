@@ -357,3 +357,82 @@ ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'p
 Element 'pair', line 122
 
 
+Tue Oct 21 11:42:06 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized element
+Element 'resolution', line 22
+
+
+Tue Oct 21 11:42:24 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized element
+Element 'resolution', line 22
+
+
+Tue Oct 21 12:23:39 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized element
+Element 'camera', line 8
+
+
+Tue Oct 21 12:30:20 2025
+ERROR: Load model error: XML Error: multiple orientation specifiers are not allowed
+Element 'camera', line 25
+
+
+Tue Oct 21 13:38:55 2025
+ERROR: Load model error: XML Error: attribute 'pos' does not have enough data
+Element 'camera', line 23
+
+
+Tue Oct 21 13:42:21 2025
+ERROR: Load model error: XML Error: required attribute missing: 'resolution'
+Element 'camera', line 23
+
+
+Tue Oct 21 13:43:26 2025
+ERROR: Load model error: XML Error: required attribute missing: 'resolution'
+Element 'camera', line 23
+
+
+Tue Oct 21 13:43:51 2025
+ERROR: Load model error: XML Error: required attribute missing: 'sensorsize'
+Element 'camera', line 23
+
+
+Tue Oct 21 14:14:20 2025
+ERROR: Load model error: XML Error: multiple orientation specifiers are not allowed
+Element 'camera', line 23
+
+
+Tue Oct 21 14:27:59 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'lookat'
+Element 'camera', line 23
+
+
+Tue Oct 21 14:28:28 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'lookat'
+Element 'camera', line 23
+
+
+Tue Oct 21 14:28:50 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'lookat'
+Element 'camera', line 23
+
+
+Tue Oct 21 14:29:09 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'up'
+Element 'camera', line 23
+
+
+Tue Oct 21 14:43:55 2025
+ERROR: Load model error: XML Error: Schema violation: unrecognized attribute: 'lookat'
+Element 'camera', line 23
+
+
+Wed Nov  5 17:20:15 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 20. The simulation is unstable. Time = 856.6700.
+
+Wed Nov  5 17:28:26 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 13. The simulation is unstable. Time = 1144.3490.
+
+Thu Nov  6 10:58:01 2025
+WARNING: Nan, Inf or huge value in QACC at DOF 13. The simulation is unstable. Time = 278.9450.
+

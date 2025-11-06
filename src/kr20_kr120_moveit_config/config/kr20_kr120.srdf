@@ -21,6 +21,9 @@
         <link name="kr20_fixed"/>
         <link name="kr20_slide"/>
     </group>
+    <group name="kr20_slide">
+        <joint name="kr20_fixed_slide_joint"/>
+    </group>
     <group name="ee_kr120">
         <link name="kr120_flange"/>
         <link name="kr120_pinza_connector"/>

@@ -22,6 +22,14 @@ install(PROGRAMS
   RENAME confirm_server
 )
 
+# CMakeLists.txt (add this block)
+install(PROGRAMS
+  ${PROJECT_NAME}/mock_servers.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME mock_servers
+)
+
+
 install(PROGRAMS
   ${PROJECT_NAME}/main.py
   DESTINATION lib/${PROJECT_NAME}
