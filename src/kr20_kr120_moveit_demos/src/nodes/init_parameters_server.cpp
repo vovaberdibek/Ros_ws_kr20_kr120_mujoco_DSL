@@ -20,6 +20,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 #include "kr120_coordinator/motion_primitives.hpp"
 #include "kr120_coordinator/workflow_context.hpp"
@@ -257,6 +258,9 @@ public:
         "internal_screwing_sequence",
         std::bind(&CoordinatorNode::handleInternalScrewing, this, _1, _2));
 
+    gripper_pub_ = create_publisher<trajectory_msgs::msg::JointTrajectory>(
+        "/kr120_gripper_controller/joint_trajectory", rclcpp::QoS(10));
+
     init_timer_ = create_wall_timer(
         std::chrono::milliseconds(200),
         std::bind(&CoordinatorNode::initializeMoveGroups, this));
@@ -384,19 +388,28 @@ private:
     const auto &ctx = *context_;
 
     bool ok = true;
+
+    // 1. Move to pre-pick via free-space plan.
     ok &= kr120::motion::executeRRT(*kr120_arm_group_, ctx.pre_pick_pose);
-    ok &= kr120::motion::setJointPositions(
-        *kr120_arm_group_,
-        {"kr120_pinza_left_joint", "kr120_pinza_right_joint"},
-        {kGripperOpen[0], kGripperOpen[1]});
-    ok &= kr120::motion::executeLinearPath(*kr120_arm_group_,
-                                           {ctx.pick_pose}, 0.01, 0.0);
-    ok &= kr120::motion::setJointPositions(
-        *kr120_arm_group_,
-        {"kr120_pinza_left_joint", "kr120_pinza_right_joint"},
-        {kGripperClosed[0], kGripperClosed[1]});
-    ok &= kr120::motion::executeLinearPath(*kr120_arm_group_,
-                                           {ctx.post_pick_pose}, 0.01, 0.0);
+    waitForStateUpdate();
+
+    // 2. Ensure the gripper is open before approaching.
+    commandGripper(kGripperOpen, 0.25);
+    rclcpp::sleep_for(std::chrono::milliseconds(250));
+
+    // 3. Approach the tray with a straight cartesian move.
+    ok &= kr120::motion::executeLinearPath(
+        *kr120_arm_group_, {ctx.pick_pose}, 0.01, 0.0);
+    waitForStateUpdate();
+
+    // 4. Close the gripper and wait briefly for the controller.
+    commandGripper(kGripperClosed, 0.25);
+    rclcpp::sleep_for(std::chrono::milliseconds(250));
+
+    // 5. Retreat back to the same pre-pick pose using a free-space plan to avoid collisions.
+    ok &= kr120::motion::executeRRT(*kr120_arm_group_, ctx.pre_pick_pose);
+    waitForStateUpdate();
+
     return ok;
   }
 
@@ -405,14 +418,14 @@ private:
 
     bool ok = true;
     ok &= kr120::motion::executeRRT(*kr120_arm_group_, ctx.pre_end_pose);
+    waitForStateUpdate();
     ok &= kr120::motion::executeLinearPath(*kr120_arm_group_,
                                            {ctx.end_pose}, 0.01, 0.0);
-    ok &= kr120::motion::setJointPositions(
-        *kr120_arm_group_,
-        {"kr120_pinza_left_joint", "kr120_pinza_right_joint"},
-        {kGripperOpen[0], kGripperOpen[1]});
+    commandGripper(kGripperOpen, 0.35);
+    waitForStateUpdate();
     ok &= kr120::motion::executeLinearPath(*kr120_arm_group_,
                                            {ctx.pre_end_pose}, 0.01, 0.0);
+    waitForStateUpdate();
     return ok;
   }
 
@@ -467,17 +480,21 @@ private:
               *kr20_arm_group_, {approach_pose}, 0.01, 0.0)) {
         return false;
       }
+      waitForStateUpdate();
       if (!kr120::motion::executeRRT(*kr20_arm_group_, screw_pose)) {
         return false;
       }
+      waitForStateUpdate();
       if (!kr120::motion::executeSlideStroke(*kr20_slide_group_,
                                              slideInsertionTarget(screw_index),
                                              kSlideRetract)) {
         return false;
       }
+      waitForStateUpdate();
       if (!kr120::motion::executeRRT(*kr20_arm_group_, approach_pose)) {
         return false;
       }
+      waitForStateUpdate();
     }
 
     return true;
@@ -486,6 +503,8 @@ private:
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr120_arm_group_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr20_arm_group_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr20_slide_group_;
+
+  rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr gripper_pub_;
 
   rclcpp::Service<InitParameters>::SharedPtr init_srv_;
   rclcpp::Service<PickTray>::SharedPtr pick_srv_;
@@ -498,6 +517,43 @@ private:
 
   std::vector<geometry_msgs::msg::Pose> screw_targets_;
   std::vector<std::vector<int>> screw_sequences_;
+
+  void commandGripper(const std::array<double, 2> &target_positions,
+                      double duration_seconds = 0.5) {
+    if (!gripper_pub_) {
+      RCLCPP_WARN(get_logger(), "Gripper command ignored: publisher not ready.");
+      return;
+    }
+
+    trajectory_msgs::msg::JointTrajectory trajectory;
+    trajectory.header.stamp = now();
+    trajectory.joint_names = {"kr120_pinza_left_joint", "kr120_pinza_right_joint"};
+
+    trajectory_msgs::msg::JointTrajectoryPoint point;
+    point.positions.assign(target_positions.begin(), target_positions.end());
+    point.velocities.assign(2, 0.0);
+    point.accelerations.assign(2, 0.0);
+    point.time_from_start.sec = static_cast<int32_t>(duration_seconds);
+    point.time_from_start.nanosec =
+        static_cast<uint32_t>((duration_seconds - point.time_from_start.sec) * 1e9);
+
+    trajectory.points.push_back(point);
+    gripper_pub_->publish(trajectory);
+
+    // Allow the controller a short window to execute before planning the next motion.
+    const auto wait_ms = static_cast<int>(std::max(duration_seconds, 0.1) * 1000.0);
+    rclcpp::sleep_for(std::chrono::milliseconds(wait_ms));
+  }
+
+  void waitForStateUpdate(double timeout_seconds = 1.0) {
+    auto state = kr120_arm_group_->getCurrentState(timeout_seconds);
+    if (!state) {
+      RCLCPP_WARN(
+          get_logger(),
+          "Timed out waiting for /joint_states to update (%.2fs). Planning may start from stale state.",
+          timeout_seconds);
+    }
+  }
 };
 
 int main(int argc, char **argv) {

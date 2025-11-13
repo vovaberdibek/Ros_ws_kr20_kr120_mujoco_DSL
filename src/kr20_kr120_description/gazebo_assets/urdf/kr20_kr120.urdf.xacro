@@ -1,20 +1,19 @@
 <?xml version = "1.0"?>
 <robot name="kr20_kr120" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find kr20_kr120_description)/urdf/kr20_macro.xacro"/>
-    <xacro:include filename="$(find kr20_kr120_description)/urdf/avvitatore.xacro"/>
-    <xacro:include filename="$(find kr20_kr120_description)/urdf/kr120_macro.xacro"/>
-    <xacro:include filename="$(find kr20_kr120_description)/urdf/pinza.xacro"/>
-    <xacro:include filename="$(find kr20_kr120_description)/urdf/rulliera.xacro"/>
-
+    <xacro:include filename="$(find kr20_kr120)/urdf/kr20_macro.xacro"/>
+    <xacro:include filename="$(find kr20_kr120)/urdf/avvitatore.xacro"/>
+    <xacro:include filename="$(find kr20_kr120)/urdf/kr120_macro.xacro"/>
+    <xacro:include filename="$(find kr20_kr120)/urdf/pinza.xacro"/>
+    <xacro:include filename="$(find kr20_kr120)/urdf/rulliera.xacro"/>
 
     <!-- Fix the robot to the world-->
     <link name="world"/>
         
     <xacro:kuka_kr20_r1810 name="kr20_basamento" origin_xyz="0.165 -0.3675 0" origin_rpy= "-1.5708 0 0"  
-                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_basement.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_basement.stl" scale="0.001 0.001 0.001"/>
+                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120/visual/kr20_basement.dae" file_stl="package://kr20_kr120/collision/kr20_basement.stl" scale="0.001 0.001 0.001"/>
 
-    <joint name="kr20_world_fixed" type="fixed">
+    <joint name="kr20_fixed" type="fixed">
         <origin rpy="0 0 -1.5708" xyz="0 0 0"/>
         <parent link="world"/>
         <child link="kr20_basamento"/>
@@ -27,38 +26,38 @@
     </joint>
 
     <xacro:kuka_kr20_r1810 name="kr20_base_link" origin_xyz="0 0 0.551" origin_rpy= "0 0 0"  
-                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_base.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_base.stl" scale="0.001 0.001 0.001"/>
+                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120/visual/kr20_base.dae" file_stl="package://kr20_kr120/collision/kr20_base.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr20_r1810 name="kr20_link1" origin_xyz="0 0 0.551" origin_rpy= "0 0 0"  
-                            mass="1.5" ixx="0.054147" ixy="0" ixz="0" iyy="0.054147" iyz="0" izz="0.001875" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_asse1.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_asse1.stl" scale="0.001 0.001 0.001"/>
+                            mass="1.5" ixx="0.054147" ixy="0" ixz="0" iyy="0.054147" iyz="0" izz="0.001875" file_dae="package://kr20_kr120/visual/kr20_asse1.dae" file_stl="package://kr20_kr120/collision/kr20_asse1.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr20_r1810_joint name="kr20_base_link__link1" type="revolute" parent="kr20_base_link" child="kr20_link1" 
                             axis="0 0 1" limit_l="-3.22886" limit_u="3.22886" limit_v="3.49066" limit_e="100" 
                             origin_xyz="0 0 0" origin_rpy="0 0 0" damping="40" friction="10"/>
     
     <xacro:kuka_kr20_r1810 name="kr20_link2" origin_xyz="-0.16 0 -0.52" origin_rpy= "0 0 0" 
-                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_asse2.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_asse2.stl" scale="0.001 0.001 0.001" />
+                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120/visual/kr20_asse2.dae" file_stl="package://kr20_kr120/collision/kr20_asse2.stl" scale="0.001 0.001 0.001" />
 
     <xacro:kuka_kr20_r1810_joint name="kr20_link1__link2" type="revolute" parent="kr20_link1" child="kr20_link2" 
                             axis="0 1 0" limit_l="-1.65806" limit_u="2.70526" limit_v="3.05433" limit_e="100" 
                             origin_xyz="0.16 0 1.071" origin_rpy="0 0 0" damping="40" friction="10"/>
 
     <xacro:kuka_kr20_r1810 name="kr20_link3" origin_xyz="-0.16 0 -1.3" origin_rpy= "0 0 0" 
-                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_asse3.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_asse3.stl" scale="0.001 0.001 0.001"/>
+                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120/visual/kr20_asse3.dae" file_stl="package://kr20_kr120/collision/kr20_asse3.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr20_r1810_joint name="kr20_link2__link3" type="revolute" parent="kr20_link2" child="kr20_link3" 
                             axis="0 1 0" limit_l="-3.97935" limit_u="1.48353" limit_v="3.31613" limit_e="100" 
                             origin_xyz="0 0 0.78" origin_rpy="0 0 0" damping="40" friction="10"/>
 
     <xacro:kuka_kr20_r1810 name="kr20_link4" origin_xyz="-0.393 0 -1.45" origin_rpy= "0 0 0" 
-                            mass="1" ixx="0.00565" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.00565" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_asse4.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_asse4.stl" scale="0.001 0.001 0.001"/>
+                            mass="1" ixx="0.00565" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.00565" file_dae="package://kr20_kr120/visual/kr20_asse4.dae" file_stl="package://kr20_kr120/collision/kr20_asse4.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr20_r1810_joint name="kr20_link3__link4" type="revolute" parent="kr20_link3" child="kr20_link4" 
                             axis="1 0 0" limit_l="-6.10865" limit_u="6.10865" limit_v="7.50492" limit_e="100" 
                             origin_xyz="0.233 0 0.15" origin_rpy="0 0 0" damping="40" friction="10"/>
     
     <xacro:kuka_kr20_r1810 name="kr20_link5" origin_xyz="-1.02 0 -1.45" origin_rpy= "0 0 0" 
-                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_asse5.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_asse5.stl" scale="0.001 0.001 0.001"/>
+                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120/visual/kr20_asse5.dae" file_stl="package://kr20_kr120/collision/kr20_asse5.stl" scale="0.001 0.001 0.001"/>
     
     <xacro:kuka_kr20_r1810_joint name="kr20_link4__link5" type="revolute" parent="kr20_link4" child="kr20_link5" 
                             axis="0 1 0" limit_l="-2.26893" limit_u="2.26893" limit_v="7.50492" limit_e="100" 
@@ -70,14 +69,14 @@
 
     <!-- Build the TCP or end effector-->
     <xacro:kuka_kr20_r1810 name="kr20_flange" origin_xyz="-1.246 0 -1.45" origin_rpy="0 0 0" mass="1"  ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816"
-                                        file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_flange.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_flange.stl" scale="0.001 0.001 0.001" />
+                                        file_dae="package://kr20_kr120/visual/kr20_flange.dae" file_stl="package://kr20_kr120/collision/kr20_flange.stl" scale="0.001 0.001 0.001" />
 
    <xacro:kuka_kr20_r1810_joint name="kr20_link5__flange" type="revolute" parent="kr20_link5" child="kr20_flange" 
                             axis="1 0 0" limit_l="-6.10865" limit_u="6.10865" limit_v="10.9956" limit_e="100"
                             origin_xyz="0.153 0 0" origin_rpy="0 0 0" damping="40" friction="10"/>
 
     <xacro:kuka_kr20_r1810 name="kr20_wrist" origin_xyz="0.066 0 0" origin_rpy="0 1.5708 1.5708" mass="1"  ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816"
-                file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr20_polso.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr20_polso.stl" scale="0.001 0.001 0.001" />
+                file_dae="package://kr20_kr120/visual/kr20_polso.dae" file_stl="package://kr20_kr120/collision/kr20_polso.stl" scale="0.001 0.001 0.001" />
 
    <xacro:kuka_kr20_r1810_joint name="kr20_flange__wrist" type="fixed" parent="kr20_flange" child="kr20_wrist" 
                             axis="1 0 0" limit_l="-6.10865" limit_u="6.10865" limit_v="10.9956" limit_e="100"
@@ -118,7 +117,7 @@
                         actuator_name="kr20_motor_link5__flange" />
 
     <xacro:kuka_kr120_r2700 name="kr120_basamento" origin_xyz="-1.265 -1.9575 0" origin_rpy= "-1.5708 0 0"  
-                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_basement.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_basement.stl" scale="0.001 0.001 0.001"/>
+                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120/visual/kr120_basement.dae" file_stl="package://kr20_kr120/collision/kr120_basement.stl" scale="0.001 0.001 0.001"/>
 
     <joint name="kr120_fixed" type="fixed">
         <origin rpy="0 0 1.5708" xyz="1.59 -1.430 0"/>
@@ -133,10 +132,10 @@
     </joint>
 
     <xacro:kuka_kr120_r2700 name="kr120_base_link" origin_xyz="0 0 0.529" origin_rpy= "0 0 0"  
-                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_base.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_base.stl" scale="0.001 0.001 0.001"/>
+                            mass="1" ixx="0.01625" ixy="0" ixz="0" iyy="0.01625" iyz="0" izz="0.005" file_dae="package://kr20_kr120/visual/kr120_base.dae" file_stl="package://kr20_kr120/collision/kr120_base.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr120_r2700 name="kr120_link1" origin_xyz="0 0 0.529" origin_rpy= "0 0 0"  
-                            mass="1.5" ixx="0.054147" ixy="0" ixz="0" iyy="0.054147" iyz="0" izz="0.001875" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_asse1.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_asse1.stl" scale="0.001 0.001 0.001"/>
+                            mass="1.5" ixx="0.054147" ixy="0" ixz="0" iyy="0.054147" iyz="0" izz="0.001875" file_dae="package://kr20_kr120/visual/kr120_asse1.dae" file_stl="package://kr20_kr120/collision/kr120_asse1.stl" scale="0.001 0.001 0.001"/>
 
     
     <xacro:kuka_kr120_r2700_joint name="kr120_base_link__link1" type="revolute" parent="kr120_base_link" child="kr120_link1" 
@@ -144,7 +143,7 @@
                             origin_xyz="0 0 0" origin_rpy="0 0 0" damping="40" friction="10"/>
     
     <xacro:kuka_kr120_r2700 name="kr120_link2" origin_xyz="-0.33 0 -0.645" origin_rpy= "0 0 0" 
-                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_asse2.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_asse2.stl" scale="0.001 0.001 0.001"/>
+                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120/visual/kr120_asse2.dae" file_stl="package://kr20_kr120/collision/kr120_asse2.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr120_r2700_joint name="kr120_link1__link2" type="revolute" parent="kr120_link1" child="kr120_link2" 
                             axis="0 1 0" limit_l="-0.872665" limit_u="1.48353" limit_v="2.00713" limit_e="100" 
@@ -152,7 +151,7 @@
 
 
     <xacro:kuka_kr120_r2700 name="kr120_link3" origin_xyz="-0.33 0.0 -1.795" origin_rpy= "0 0 0" 
-                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_asse3.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_asse3.stl" scale="0.001 0.001 0.001"/>
+                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120/visual/kr120_asse3.dae" file_stl="package://kr20_kr120/collision/kr120_asse3.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr120_r2700_joint name="kr120_link2__link3" type="revolute" parent="kr120_link2" child="kr120_link3" 
                             axis="0 1 0" limit_l="-3.66519" limit_u="1.27409" limit_v="2.0944" limit_e="100" 
@@ -161,7 +160,7 @@
     
 
     <xacro:kuka_kr120_r2700 name="kr120_link4" origin_xyz="-0.697 0.0 -1.910" origin_rpy= "0 0 0" 
-                            mass="1" ixx="0.00565" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.00565" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_asse4.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_asse4.stl" scale="0.001 0.001 0.001"/>
+                            mass="1" ixx="0.00565" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.00565" file_dae="package://kr20_kr120/visual/kr120_asse4.dae" file_stl="package://kr20_kr120/collision/kr120_asse4.stl" scale="0.001 0.001 0.001"/>
 
     <xacro:kuka_kr120_r2700_joint name="kr120_link3__link4" type="revolute" parent="kr120_link3" child="kr120_link4" 
                             axis="1 0 0" limit_l="-6.10865" limit_u="6.10865" limit_v="3.31613" limit_e="100" 
@@ -169,7 +168,7 @@
     
 
     <xacro:kuka_kr120_r2700 name="kr120_link5" origin_xyz="-1.55 0 -1.910" origin_rpy= "0 0 0" 
-                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_asse5.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_asse5.stl" scale="0.001 0.001 0.001"/>
+                            mass="2" ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816" file_dae="package://kr20_kr120/visual/kr120_asse5.dae" file_stl="package://kr20_kr120/collision/kr120_asse5.stl" scale="0.001 0.001 0.001"/>
     
     <xacro:kuka_kr120_r2700_joint name="kr120_link4__link5" type="revolute" parent="kr120_link4" child="kr120_link5" 
                             axis="0 1 0" limit_l="-2.18166" limit_u="2.18166" limit_v="3.14159" limit_e="100" 
@@ -180,7 +179,7 @@
 
     <!-- Build the TCP or end effector-->
     <xacro:kuka_kr120_r2700 name="kr120_flange" origin_xyz="-1.765 0 -1.910" origin_rpy="0 0 0" mass="1"  ixx="0.4816" ixy="0" ixz="0" iyy="0" iyz="0" izz="0.4816"
-                                        file_dae="package://kr20_kr120_description/gazebo_assets/visual/kr120_flange.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/kr120_flange.stl" scale="0.001 0.001 0.001"/>
+                                        file_dae="package://kr20_kr120/visual/kr120_flange.dae" file_stl="package://kr20_kr120/collision/kr120_flange.stl" scale="0.001 0.001 0.001"/>
    <xacro:kuka_kr120_r2700_joint name="kr120_link5__flange" type="revolute" parent="kr120_link5" child="kr120_flange" 
                             axis="1 0 0" limit_l="-6.10865" limit_u="6.10865" limit_v="4.53786" limit_e="100"
                             origin_xyz="0.215 0 0" origin_rpy="0 0 0" damping="40" friction="10"/>
@@ -215,60 +214,9 @@
                         joint_name="kr120_link4__link5" 
                         actuator_name="kr120_motor_link4__link5" />
 
-    <xacro:kuka_kr120_r2700_transmission name="kr120_trans_link5__flange" 
+     <xacro:kuka_kr120_r2700_transmission name="kr120_trans_link5__flange" 
                         joint_name="kr120_link5__flange" 
                         actuator_name="kr120_motor_link5__flange" />
-
-    <ros2_control name="kr_hw" type="system">
-      <hardware>
-          <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-      </hardware>
-
-      <!-- KR20 joints -->
-      <joint name="kr20_base_link__link1">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-      <joint name="kr20_link1__link2"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr20_link2__link3"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr20_link3__link4"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr20_link4__link5"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr20_link5__flange"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-
-      <!-- KR120 joints -->
-      <joint name="kr120_base_link__link1"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr120_link1__link2"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr120_link2__link3"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr120_link3__link4"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr120_link4__link5"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-      <joint name="kr120_link5__flange"><command_interface name="position"/><state_interface name="position"/><state_interface name="velocity"/></joint>
-
-      <!-- KR120 gripper joints -->
-      <joint name="kr120_pinza_left_joint">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-      <joint name="kr120_pinza_right_joint">
-        <command_interface name="position"/>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-      <!-- KR120 gyro joints (so ros2_control exposes them) -->
-      <joint name="kr120_gyro_left_joint">
-        <command_interface name="velocity"/>
-        <state_interface   name="position"/>
-        <state_interface   name="velocity"/>
-      </joint>
-      <joint name="kr120_gyro_right_joint">
-        <command_interface name="velocity"/>
-        <state_interface   name="position"/>
-        <state_interface   name="velocity"/>
-      </joint>
-
-
-    </ros2_control>
 
 
     <!--  pareti -->
@@ -288,13 +236,13 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://kr20_kr120_description/gazebo_assets/visual/pareti.dae" scale="0.001 0.001 0.001" />
+          <mesh filename="package://kr20_kr120/visual/pareti.dae" scale="0.001 0.001 0.001" />
         </geometry>
       </visual>
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://kr20_kr120_description/gazebo_assets/collision/pareti.stl" scale="0.001 0.001 0.001"/>
+          <mesh filename="package://kr20_kr120/collision/pareti.stl" scale="0.001 0.001 0.001"/>
         </geometry>
       </collision>
     </link> 
@@ -308,7 +256,7 @@
       <visual>
         <origin xyz="1.252 -0.12 0.004" rpy="0 0 -1.5708"/>
         <geometry>
-          <mesh filename="package://kr20_kr120_description/gazebo_assets/visual/tavolo.dae" scale="0.001 0.001 0.001" />
+          <mesh filename="package://kr20_kr120/visual/tavolo.dae" scale="0.001 0.001 0.001" />
         </geometry>
       </visual>
       <collision>
@@ -361,17 +309,17 @@
 
     <!--links-->
  
-    <xacro:rulliera name="rl_base" origin_xyz="0.096703 0 0.65625" origin_rpy="0 0 1.5708" mass="200.0" ixx="80.0" ixy="0.0" ixz="0.0" iyy="80.0" iyz="0.0" izz="20.0"
-                    file_dae="package://kr20_kr120_description/gazebo_assets/visual/rl_infrastruttura.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/rl_infrastruttura.stl" scale="0.001 0.001 0.001"/>
+    <xacro:rulliera name="rl_base" origin_xyz="0.096703 0 0.65625" origin_rpy="0 0 1.5708" mass="1000" ixx="0.1" ixy="0.1" ixz="0.1" iyy="0.1" iyz="0.1" izz="0.1"
+                    file_dae="package://kr20_kr120/visual/rl_infrastruttura.dae" file_stl="package://kr20_kr120/collision/rl_infrastruttura.stl" scale="0.001 0.001 0.001"/>
 
-    <xacro:rulliera name="rl_plate" origin_xyz="0 0 0.473" origin_rpy="0 0 0" mass="30.0" ixx="5.0" ixy="0.0" ixz="0.0" iyy="5.0" iyz="0.0" izz="2.0"
-                    file_dae="package://kr20_kr120_description/gazebo_assets/visual/rl_piastra.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/rl_piastra.stl" scale="0.001 0.001 0.001"/>
+    <xacro:rulliera name="rl_plate" origin_xyz="0 0 0.473" origin_rpy="0 0 0" mass="100" ixx="0.1" ixy="0.1" ixz="0.1" iyy="0.1" iyz="0.1" izz="0.1"
+                    file_dae="package://kr20_kr120/visual/rl_piastra.dae" file_stl="package://kr20_kr120/collision/rl_piastra.stl" scale="0.001 0.001 0.001"/>
     
-    <xacro:rulliera name="rl_slider" origin_xyz="0 0 0.473" origin_rpy="0 0 0" mass="20.0" ixx="4.0" ixy="0.0" ixz="0.0" iyy="4.0" iyz="0.0" izz="1.5"
+    <xacro:rulliera name="rl_slider" origin_xyz="0 0 0.473" origin_rpy="0 0 0" mass="100" ixx="0.1" ixy="0.1" ixz="0.1" iyy="0.1" iyz="0.1" izz="0.1"
                     file_dae="" file_stl="" scale="0.001 0.001 0.001"/>
 
-    <xacro:rulliera name="rl_lifter" origin_xyz="-0.3455 0 -0.02" origin_rpy="1.5708 0 1.5708" mass="40.0" ixx="6.0" ixy="0.0" ixz="0.0" iyy="6.0" iyz="0.0" izz="3.0"
-                    file_dae="package://kr20_kr120_description/gazebo_assets/visual/rl_lifter.dae" file_stl="package://kr20_kr120_description/gazebo_assets/collision/rl_lifter.stl" scale="0.001 0.001 0.001"/> 
+    <xacro:rulliera name="rl_lifter" origin_xyz="-0.3455 0 -0.02" origin_rpy="1.5708 0 1.5708" mass="100" ixx="0.1" ixy="0.1" ixz="0.1" iyy="0.1" iyz="0.1" izz="0.1"
+                    file_dae="package://kr20_kr120/visual/rl_lifter.dae" file_stl="package://kr20_kr120/collision/rl_lifter.stl" scale="0.001 0.001 0.001"/> 
     <!--joints-->
 
     <xacro:rulliera_joint name="rl_slider__plate" type="revolute" parent="rl_slider" child="rl_plate" axis="0 0 1" limit_l="0" limit_u="6.283185307" limit_v="2" limit_e="100" 
@@ -401,12 +349,10 @@
 
     <!-- Gazebo plugin-->
     <gazebo>
-      <plugin name="ign_ros2_control::IgnitionROS2ControlPlugin" filename="libign_ros2_control-system.so">
-        <parameters>$(find kr20_kr120_moveit_config)/config/ros2_controllers.yaml</parameters>
-        <controller_manager_node_name>controller_manager</controller_manager_node_name>
-      </plugin>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>kr20_kr120</robotNamespace> 
+        </plugin>
     </gazebo>
-
 
     <gazebo reference="kr20_base_link">
       <gravity>0</gravity>

@@ -70,6 +70,9 @@
     <mesh name="rl_infrastruttura" file="rl_infrastruttura.obj" scale="0.001 0.001 0.001"/>
     <mesh name="rl_piastra"        file="rl_piastra.obj"        scale="0.001 0.001 0.001"/>
     <mesh name="rl_lifter"         file="rl_lifter.obj"         scale="0.001 0.001 0.001"/>
+
+    <mesh name="tray" file="tray_aoc.obj" scale="0.001 0.001 0.001"/>
+    <material name="tray_mtl" rgba="0.75 0.75 0.75 1" specular="0.2" shininess="0.4"/>
   </asset>
 
   <worldbody>
@@ -89,6 +92,16 @@
 
     <!-- A simple table collider to catch links -->
     <geom name="table" class="env" type="box" pos="0.75 -0.2 0.45" size="0.6 0.5 0.45"/>
+
+    <!-- Tray initial pose (free body so the robot can grasp it) -->
+    <body name="tray" pos="1.01016 0.11975 0.77" euler="0 0 -1.570796">
+      <joint type="free" damping="25.0" frictionloss="1.0" armature="0.2"/>
+      <inertial pos="0 0 0" mass="3.0" diaginertia="0.010 0.015 0.020"/>
+      <geom name="tray_geom" type="mesh" mesh="tray"
+            condim="6" friction="4.0 0.05 0.005"
+            margin="0.0025" solimp="0.95 0.99 0.001" solref="0.002 1.2"
+            contype="1" conaffinity="3" material="tray_mtl"/>
+    </body>
 
     <!-- KR20 anchored (no free joint at base) -->
     <body name="kr20_anchor" quat="0.707105 0 0 -0.707108">
@@ -826,5 +839,3 @@
 
 
 <!-- 
-
-

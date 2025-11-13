@@ -220,7 +220,6 @@
                         actuator_name="kr120_motor_link5__flange" />
 
     <ros2_control name="kr_hw" type="system">
-      <!-- If you only use RViz/MoveIt (no Gazebo), use a pure fake system -->
       <hardware>
           <plugin>mujoco_ros2_control/MujocoSystem</plugin>
       </hardware>
@@ -403,8 +402,6 @@
     <!-- Gazebo plugin-->
     <gazebo>
       <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-        <!-- Optional: point to your ros2_control YAML -->
-        <!-- <parameters>$(find kr20_kr120_moveit_config)/config/ros2_controllers.yaml</parameters> -->
       </plugin>
     </gazebo>
 

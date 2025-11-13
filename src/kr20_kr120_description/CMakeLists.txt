@@ -16,10 +16,11 @@ foreach(dir launch config urdf collision materials visual meshes)
   install(DIRECTORY ${dir}/ DESTINATION share/${PROJECT_NAME}/${dir})
 endforeach()
 
+install(DIRECTORY gazebo_assets/ DESTINATION share/${PROJECT_NAME}/gazebo_assets)
+
 # Install ALL MuJoCo stuff recursively (XML + meshes + .obj/.stl/.dae/.mtl)
 install(DIRECTORY mujoco/ DESTINATION share/${PROJECT_NAME}/mujoco)
 
 
 ament_package()
-
 
