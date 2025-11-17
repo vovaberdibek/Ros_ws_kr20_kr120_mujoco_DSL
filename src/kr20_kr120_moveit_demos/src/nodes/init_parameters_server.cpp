@@ -16,6 +16,7 @@
 #include <custom_interfaces/srv/pick_tray.hpp>
 #include <custom_interfaces/srv/place_tray.hpp>
 #include <custom_interfaces/srv/internal_screwing_sequence.hpp>
+#include <custom_interfaces/srv/internal_screw_by_num.hpp>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Vector3.h>
@@ -220,6 +221,7 @@ class CoordinatorNode : public rclcpp::Node {
   using PickTray = custom_interfaces::srv::PickTray;
   using PlaceTray = custom_interfaces::srv::PlaceTray;
   using InternalScrewingSequence = custom_interfaces::srv::InternalScrewingSequence;
+  using InternalScrewByNum = custom_interfaces::srv::InternalScrewByNum;
 
 public:
   CoordinatorNode()
@@ -257,6 +259,9 @@ public:
     screw_srv_ = create_service<InternalScrewingSequence>(
         "internal_screwing_sequence",
         std::bind(&CoordinatorNode::handleInternalScrewing, this, _1, _2));
+    screw_single_srv_ = create_service<InternalScrewByNum>(
+        "internal_screw_by_num",
+        std::bind(&CoordinatorNode::handleInternalScrewByNum, this, _1, _2));
 
     gripper_pub_ = create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "/kr120_gripper_controller/joint_trajectory", rclcpp::QoS(10));
@@ -445,7 +450,6 @@ private:
       return false;
     }
 
-    const auto &tray_pose = context_->tray_step_poses.at(index);
     const auto &sequence = screw_sequences_.at(index);
 
     if (sequence.empty()) {
@@ -453,51 +457,93 @@ private:
       return true;
     }
 
-    const double tray_angle =
-        contains(context_->rotation_steps, index) ? context_->tray_angle2
-                                                  : context_->tray_angle1;
-
     for (int screw_index : sequence) {
-      if (screw_index < 0 ||
-          static_cast<std::size_t>(screw_index) >= screw_targets_.size()) {
-        RCLCPP_WARN(get_logger(),
-                    "Skipping screw index %d (outside loaded pose range %zu).",
-                    screw_index,
-                    screw_targets_.size());
-        continue;
-      }
-
-      const geometry_msgs::msg::Pose flange_pose = computeFlangePose(
-          screw_targets_.at(screw_index), tray_pose, context_->tip_offset);
-
-      const double approach_offset = screwApproachOffset(screw_index);
-      const geometry_msgs::msg::Pose screw_pose =
-          kr120::motion::computeScrewPose(flange_pose, approach_offset);
-      const geometry_msgs::msg::Pose approach_pose =
-          makeApproachPose(screw_pose, tray_angle);
-
-      if (!kr120::motion::executeLinearPath(
-              *kr20_arm_group_, {approach_pose}, 0.01, 0.0)) {
+      if (!executeSingleScrew(index, screw_index)) {
         return false;
       }
-      waitForStateUpdate();
-      if (!kr120::motion::executeRRT(*kr20_arm_group_, screw_pose)) {
-        return false;
-      }
-      waitForStateUpdate();
-      if (!kr120::motion::executeSlideStroke(*kr20_slide_group_,
-                                             slideInsertionTarget(screw_index),
-                                             kSlideRetract)) {
-        return false;
-      }
-      waitForStateUpdate();
-      if (!kr120::motion::executeRRT(*kr20_arm_group_, approach_pose)) {
-        return false;
-      }
-      waitForStateUpdate();
     }
 
     return true;
+  }
+
+  bool executeSingleScrew(std::size_t tray_index, int screw_index) {
+    if (tray_index >= context_->tray_step_poses.size()) {
+      RCLCPP_ERROR(get_logger(),
+                   "Tray index %zu out of bounds (tray poses: %zu).",
+                   tray_index,
+                   context_->tray_step_poses.size());
+      return false;
+    }
+
+    if (screw_index < 0 ||
+        static_cast<std::size_t>(screw_index) >= screw_targets_.size()) {
+      RCLCPP_ERROR(get_logger(),
+                   "Screw index %d outside loaded pose range %zu.",
+                   screw_index,
+                   screw_targets_.size());
+      return false;
+    }
+
+    const auto &tray_pose = context_->tray_step_poses.at(tray_index);
+    const double tray_angle =
+        contains(context_->rotation_steps, tray_index) ? context_->tray_angle2
+                                                       : context_->tray_angle1;
+
+    const geometry_msgs::msg::Pose flange_pose = computeFlangePose(
+        screw_targets_.at(screw_index), tray_pose, context_->tip_offset);
+    const double approach_offset = screwApproachOffset(screw_index);
+    const geometry_msgs::msg::Pose screw_pose =
+        kr120::motion::computeScrewPose(flange_pose, approach_offset);
+    const geometry_msgs::msg::Pose approach_pose =
+        makeApproachPose(screw_pose, tray_angle);
+
+    if (!kr120::motion::executeLinearPath(
+            *kr20_arm_group_, {approach_pose}, 0.01, 0.0)) {
+      return false;
+    }
+    waitForStateUpdate();
+    if (!kr120::motion::executeRRT(*kr20_arm_group_, screw_pose)) {
+      return false;
+    }
+    waitForStateUpdate();
+    if (!kr120::motion::executeSlideStroke(
+            *kr20_slide_group_, slideInsertionTarget(screw_index), kSlideRetract)) {
+      return false;
+    }
+    waitForStateUpdate();
+    if (!kr120::motion::executeRRT(*kr20_arm_group_, approach_pose)) {
+      return false;
+    }
+    waitForStateUpdate();
+
+    return true;
+  }
+
+  void handleInternalScrewByNum(
+      const std::shared_ptr<InternalScrewByNum::Request> request,
+      std::shared_ptr<InternalScrewByNum::Response> response) {
+    if (!ensureReady("internal_screw_by_num", response)) {
+      response->message = "system not ready";
+      return;
+    }
+
+    if (request->index < 0 ||
+        static_cast<std::size_t>(request->index) >= context_->tray_step_poses.size()) {
+      response->success = false;
+      response->message = "tray index out of range";
+      RCLCPP_ERROR(get_logger(),
+                   "Internal screw request rejected: tray index %d invalid.",
+                   request->index);
+      return;
+    }
+
+    if (!executeSingleScrew(request->index, request->screw_num)) {
+      response->success = false;
+      response->message = "failed to execute screw";
+    } else {
+      response->success = true;
+      response->message = "screw completed";
+    }
   }
 
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr120_arm_group_;
@@ -510,6 +556,7 @@ private:
   rclcpp::Service<PickTray>::SharedPtr pick_srv_;
   rclcpp::Service<PlaceTray>::SharedPtr place_srv_;
   rclcpp::Service<InternalScrewingSequence>::SharedPtr screw_srv_;
+  rclcpp::Service<InternalScrewByNum>::SharedPtr screw_single_srv_;
 
   rclcpp::TimerBase::SharedPtr init_timer_;
   bool move_groups_ready_{false};

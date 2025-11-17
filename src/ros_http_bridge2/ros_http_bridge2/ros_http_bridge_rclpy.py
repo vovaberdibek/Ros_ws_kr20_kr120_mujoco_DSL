@@ -5,6 +5,7 @@ import sys
 import threading
 import json
 import subprocess
+import traceback
 from typing import Dict, List, Any, Optional
 
 import rclpy
@@ -17,6 +18,7 @@ from pydantic import BaseModel
 from starlette.responses import StreamingResponse
 
 from lark import Lark
+from lark.exceptions import UnexpectedInput
 import importlib.resources as pkg_res
 
 # -------------- Import ROS 2 service types --------------
@@ -302,12 +304,19 @@ async def run_workflow(req: RunModel):
     # Parse DSL
     try:
         tree = _parser.parse(req.dsl)
+    except UnexpectedInput as e:
+        detail = (
+            f"DSL parse error at line {e.line}, column {e.column}: {e.get_context(req.dsl)}"
+        )
+        raise HTTPException(status_code=400, detail=detail)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"DSL parse error: {e}")
 
-    # Capture stdout
+    # Capture stdout/stderr
     buf = io.StringIO()
-    old_stdout, sys.stdout = sys.stdout, buf
+    old_stdout, old_stderr = sys.stdout, sys.stderr
+    sys.stdout = buf
+    sys.stderr = buf
 
     # Monkey-patch confirmation to use /confirm_response path
     from .robot_manager import RobotHTTPClient
@@ -324,8 +333,11 @@ async def run_workflow(req: RunModel):
         try:
             mgr = RobotManager(tree)
             mgr.execute_workflow()
+        except Exception:
+            traceback.print_exc()
         finally:
             sys.stdout = old_stdout
+            sys.stderr = old_stderr
 
     t = threading.Thread(target=_run, daemon=True)
     t.start()

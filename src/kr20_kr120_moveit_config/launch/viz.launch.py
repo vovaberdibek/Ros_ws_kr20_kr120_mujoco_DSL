@@ -1,7 +1,8 @@
 from launch import LaunchDescription
-from launch.actions import TimerAction
+from launch.actions import TimerAction, DeclareLaunchArgument
 from launch_ros.actions import Node
-from launch.substitutions import Command, PathJoinSubstitution
+from launch.substitutions import Command, PathJoinSubstitution, LaunchConfiguration
+from launch.conditions import IfCondition
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 from ament_index_python.packages import get_package_share_directory
@@ -18,6 +19,8 @@ def _load_text(pkg: str, relpath: str):
         return f.read()
 
 def generate_launch_description():
+    launch_ros2_control = LaunchConfiguration("launch_ros2_control")
+
     # --- Robot description (xacro -> URDF) ---
     robot_xacro = PathJoinSubstitution([
         FindPackageShare("kr20_kr120_description"),
@@ -89,6 +92,7 @@ def generate_launch_description():
         executable="ros2_control_node",
         output="screen",
         parameters=[robot_description, ros2_controllers_yaml],
+        condition=IfCondition(launch_ros2_control),
     )
 
     spawner_jsb = Node(
@@ -96,18 +100,21 @@ def generate_launch_description():
         executable="spawner",
         arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
         output="screen",
+        condition=IfCondition(launch_ros2_control),
     )
     spawner_kr20 = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["kr20_arm_controller", "--controller-manager", "/controller_manager"],
         output="screen",
+        condition=IfCondition(launch_ros2_control),
     )
     spawner_kr120 = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["kr120_arm_controller", "--controller-manager", "/controller_manager"],
         output="screen",
+        condition=IfCondition(launch_ros2_control),
     )
 
     jsp = Node(
@@ -148,11 +155,18 @@ def generate_launch_description():
         parameters=[
             robot_description,
             robot_description_semantic,
-            kinematics_yaml,     
+            kinematics_yaml,
         ],
     )
 
+    declare_ros2_control = DeclareLaunchArgument(
+        "launch_ros2_control",
+        default_value="true",
+        description="Launch the embedded ros2_control stack (set false when an external controller is running)",
+    )
+
     return LaunchDescription([
+        declare_ros2_control,
         robot_state_publisher,
         joint_state_publisher,
         ros2_control_node,
@@ -161,8 +175,8 @@ def generate_launch_description():
         TimerAction(period=2.0, actions=[spawner_kr20]),
         TimerAction(period=2.5, actions=[spawner_kr120]),
         move_group,
-        rviz,
-        jsp
+        # rviz,
+        # jsp
     ])
 
 

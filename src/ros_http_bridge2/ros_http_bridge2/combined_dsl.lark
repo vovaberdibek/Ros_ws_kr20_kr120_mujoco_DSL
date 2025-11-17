@@ -1,5 +1,8 @@
 
-start: agents_definition locations_definition trays_definition parameters_definition? tray_step_poses_definition? main_poses_definition? assembly_definition
+start: mode_definition agents_definition locations_definition trays_definition parameters_definition? tray_step_poses_definition? main_poses_definition? assembly_definition
+
+mode_definition: "Mode" ":" MODE_VALUE
+MODE_VALUE: "simulation" | "real"
 
 agents_definition: "Agents" ":" agent+
 agent: IDENTIFIER
@@ -68,9 +71,13 @@ unit_value: IDENTIFIER
           | screw_block
 
 screw_block: "{" screw_field ("," screw_field)* "}"
-screw_field: "positions" ":" "[" vector6 ("," vector6)* "]"
-           | "manual_indices" ":" int_list
-           | "auto_indices" ":" int_list
+screw_field: manual_field
+            | auto_field
+            | positions_field
+
+manual_field: "manual_indices" ":" int_list
+auto_field: "auto_indices" ":" int_list
+positions_field: "positions" ":" "[" vector6 ("," vector6)* "]"
 
 
 tray_line: "tray" ":" IDENTIFIER
@@ -83,23 +90,29 @@ final_pose: "final_pose" ":" vector6
 
 
 assembly_definition: "Assembly" ":" assembly_command+
-assembly_command: CONTROL_TYPE (add_tray | add_tray2 | pick_tray | operator_position_tray | recharge_sequence | internal_screw_by_num | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble) [repeat] [speed]
+assembly_command: CONTROL_TYPE (add_tray | pick_tray | operator_position_tray | recharge_sequence | internal_screw_unit_hole | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble | call_block) [repeat] [speed]
 
-add_tray: "AddTray" "(" INT ")"
-add_tray2: "AddTray2" "(" STRING ["," STRING] ")"
-operator_position_tray: "OperatorPositionTray" "(" INT ")"
-recharge_sequence: "RechargeSequence" "(" INT ")"
-internal_screw_by_num: "InternalScrewByNum" "(" INT "," INT ")"
-internal_screwing_sequence: "InternalScrewingSequence" "(" INT ")"
-external_screwing_sequence: "ExternalScrewingSequence" "(" INT ")"
-pick_tray: "PickTray" "(" INT ")"
-place_tray: "PlaceTray" "(" INT ")"
+add_tray: "AddTray" named_arg named_arg
+operator_position_tray: "OperatorPositionTray" named_arg
+recharge_sequence: "RechargeSequence" named_arg
+internal_screw_unit_hole: ("InternalScrew" | "ScrewByNum") named_arg named_arg
+internal_screwing_sequence: "InternalScrewingSequence" named_arg
+external_screwing_sequence: "ExternalScrewingSequence" named_arg
+pick_tray: "PickTray" named_arg
+place_tray: "PlaceTray" named_arg
+call_block: "CallBlock" named_arg+
 
-load_tray: "LoadTray" "(" IDENTIFIER "," IDENTIFIER ")"
-bring_tray: "BringTray" "(" IDENTIFIER "," IDENTIFIER "," IDENTIFIER ")"
-position_tray: "PositionTray" "(" INT ")"
-initial_assemble: "InitialAssemble" "(" IDENTIFIER "," IDENTIFIER ")"
-finish_assemble: "FinishAssemble" "(" IDENTIFIER "," IDENTIFIER "," IDENTIFIER ")"
+load_tray: "LoadTray" named_arg named_arg
+bring_tray: "BringTray" named_arg named_arg named_arg
+position_tray: "PositionTray" named_arg
+initial_assemble: "InitialAssemble" named_arg named_arg
+finish_assemble: "FinishAssemble" named_arg named_arg named_arg
+
+named_arg: IDENTIFIER value_atom
+value_atom: IDENTIFIER
+         | STRING
+         | INT
+         | NUMBER
 
 
 repeat: "Repeat" "=" INT
@@ -127,7 +140,7 @@ float_list: "[" [NUMBER ("," NUMBER)*] [","] "]"
 NUMBER: SIGNED_NUMBER
 
 CONTROL_TYPE: "manual" | "automated" | "supervised"
-IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
+IDENTIFIER: /(?!manual(?![a-zA-Z0-9_])|automated(?![a-zA-Z0-9_])|supervised(?![a-zA-Z0-9_]))[a-zA-Z_][a-zA-Z0-9_]*/
 STRING: /"[^"]*"/
 COLON: ":"
 COMMA: ","

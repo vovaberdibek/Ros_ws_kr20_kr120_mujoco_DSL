@@ -1,3 +1,5 @@
+Mode: simulation
+
 Agents:
     Robot1
     Robot2
@@ -15,7 +17,12 @@ Trays:
     AOCS_Tray: {
         tray: AOC
         units:[
-            { name: MTQ12, pose_index: 0 },
+            { name: MTQ12, pose_index: 0,
+              screws: {
+                manual_indices: [80,81,84,85,88,90,92,93],
+                auto_indices:   [82,83,86,87,89,91,94,95]
+              }
+            },
             { name: MTQ3_MAG, pose_index: 1 },
             { name: CMG2, pose_index: 2 },
             { name: CMG1, pose_index: 4 },
@@ -79,61 +86,61 @@ MainPoses:
     PreEnd: [0.0, -1.43, 2.582, 0, 1.57, 0]
 
 Assembly:
-    manual AddTray2("tray_aoc", "MTQ_MAG") 
-    manual PickTray(0) 
-    manual OperatorPositionTray(0) 
-    manual PositionTray(0) 
-    manual RechargeSequence(0) 
-    manual InternalScrewingSequence(2) 
-    manual PlaceTray(0) 
+    manual AddTray tray tray_aoc object MTQ_MAG 
+    manual PickTray location Table 
+    manual OperatorPositionTray location OperatorStation 
+    manual PositionTray index 0 
+    manual RechargeSequence index 0 
+    manual InternalScrewingSequence index 2 
+    manual InternalScrew unit MTQ12 hole 82
+    manual PlaceTray location AssemblyArea 
 
-    manual AddTray2("tray_aoc", "CMG34") 
-    manual PickTray(1) 
-    manual OperatorPositionTray(1) 
-    manual PositionTray(1) 
-    manual RechargeSequence(1) 
-    manual InternalScrewingSequence(1) 
+    manual AddTray tray tray_aoc object CMG34 
+    manual PickTray location Table 
+    manual OperatorPositionTray location OperatorStation 
+    manual PositionTray index 1 
+    manual RechargeSequence index 1 
+    manual InternalScrewingSequence index 1 
     
-    manual AddTray2("tray_aoc", "CMG34") 
-    manual OperatorPositionTray(0) 
-    manual PositionTray(4) 
-    manual RechargeSequence(4) 
-    manual InternalScrewingSequence(4)                      
-    manual PlaceTray(0)
+    manual AddTray tray tray_aoc object CMG34 
+    manual OperatorPositionTray location OperatorStation 
+    manual PositionTray index 4 
+    manual RechargeSequence index 4 
+    manual InternalScrewingSequence index 4                      
+    manual PlaceTray location AssemblyArea
 
-    manual AddTray2("tray_dhc", "") 
-    manual PickTray(0) 
-    manual OperatorPositionTray(0)    
-    manual PositionTray(0) 
-    manual RechargeSequence(0) 
-    manual InternalScrewingSequence(0) 
-    manual PlaceTray(0)
+    manual AddTray tray tray_dhc object none 
+    manual PickTray location Table 
+    manual OperatorPositionTray location OperatorStation    
+    manual PositionTray index 0 
+    manual RechargeSequence index 0 
+    manual InternalScrewingSequence index 0 
+    manual PlaceTray location AssemblyArea
     
 
-    manual AddTray2("tray_eps", "BAT1")
-    manual PickTray(5) 
-    manual OperatorPositionTray(0)     
-    manual PositionTray(5) 
-    manual RechargeSequence(5) 
-    manual InternalScrewingSequence(5) 
-    manual AddTray2("tray_eps", "BAT2")                 
-    manual PickTray(6) 
-    manual OperatorPositionTray(0) 
-    manual PositionTray(6) 
-    manual RechargeSequence(6) 
-    manual InternalScrewingSequence(6) 
-    manual AddTray2("tray_eps", "PCDU") 
-    manual OperatorPositionTray(0) 
-    manual PositionTray(7) 
-    manual RechargeSequence(7) 
-    manual InternalScrewingSequence(7) 
-    manual PlaceTray(7)
+    manual AddTray tray tray_eps object BAT1
+    manual PickTray location Table 
+    manual OperatorPositionTray location OperatorStation     
+    manual PositionTray index 5 
+    manual RechargeSequence index 5 
+    manual InternalScrewingSequence index 5 
+    manual AddTray tray tray_eps object BAT2                 
+    manual PickTray location Table 
+    manual OperatorPositionTray location OperatorStation 
+    manual PositionTray index 6 
+    manual RechargeSequence index 6 
+    manual InternalScrewingSequence index 6 
+    manual AddTray tray tray_eps object PCDU 
+    manual OperatorPositionTray location OperatorStation 
+    manual PositionTray index 7 
+    manual RechargeSequence index 7 
+    manual InternalScrewingSequence index 7 
+    manual PlaceTray location AssemblyArea
 
-    manual AddTray2("tray_payload", "") 
-    manual PickTray(0) 
-    manual OperatorPositionTray(0)    
-    manual PositionTray(0) 
-    manual RechargeSequence(0) 
-    manual InternalScrewingSequence(0) 
-    manual PlaceTray(0)
-
+    manual AddTray tray tray_payload object none 
+    manual PickTray location Table 
+    manual OperatorPositionTray location OperatorStation    
+    manual PositionTray index 0 
+    manual RechargeSequence index 0 
+    manual InternalScrewingSequence index 0 
+    manual PlaceTray location AssemblyArea
