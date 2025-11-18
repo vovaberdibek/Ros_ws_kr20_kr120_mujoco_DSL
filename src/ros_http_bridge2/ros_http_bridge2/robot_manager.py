@@ -175,7 +175,11 @@ class PLCClient:
         self.msgType = modules["msgType"]
 
         if not PLCClient._rclpy_initialized:
-            self.rclpy.init(args=None)
+            try:
+                self.rclpy.init(args=None)
+            except RuntimeError as exc:
+                if "Context.init() must only be called once" not in str(exc):
+                    raise
             PLCClient._rclpy_initialized = True
 
         self.node = self.rclpy.create_node("dsl_plc_client")
@@ -529,6 +533,7 @@ class RobotManager:
         self.main_poses = {}
         self.named_poses = {}
         self.parameters = {}
+        seen_sections: set[str] = set()
 
         for child in tree.children:
             # ————————————————
@@ -540,8 +545,15 @@ class RobotManager:
                 continue
 
             # ————————————————
-            # 1) Locations
+            # 1) Agents (ignored but tracked for validation)
+            if child.data == "agents_definition":
+                seen_sections.add("Agents")
+                continue
+
+            # ————————————————
+            # 2) Locations
             if child.data == "locations_definition":
+                seen_sections.add("Locations")
                 for loc in child.children:
                     loc_name = loc.children[0].value
                     position = [float(n.value) for n in loc.children[1].children]
@@ -556,8 +568,9 @@ class RobotManager:
                         self.location_name_to_index[loc_name] = idx
 
             # ————————————————
-            # 2) Trays (with all nested attributes)
+            # 3) Trays (with all nested attributes)
             elif child.data == "trays_definition":
+                seen_sections.add("Trays")
                 for tray in child.children:
                     tray_name = tray.children[0].value
                     tray_data = {
@@ -601,24 +614,27 @@ class RobotManager:
                     trays[tray_name] = tray_data
 
             # ————————————————
-            # 3) Tray Step Poses
+            # 4) Tray Step Poses
             elif child.data == "tray_step_poses_definition":
+                seen_sections.add("TrayStepPoses")
                 self.tray_step_poses = [
                     [float(n.value) for n in entry.children[0].children]
                     for entry in child.children
                 ]
 
             # ————————————————
-            # 4) Main Poses
+            # 5) Main Poses
             elif child.data == "main_poses_definition":
+                seen_sections.add("MainPoses")
                 self.main_poses = {
                     pose.children[0].value: [float(n.value) for n in pose.children[1].children]
                     for pose in child.children
                 }
 
             # ————————————————
-            # 5) Parameters (tip_offset, tray_angles, named_pose_entry, vector3/int_list/float_list, etc.)
+            # 6) Parameters (tip_offset, tray_angles, named_pose_entry, vector3/int_list/float_list, etc.)
             elif child.data == "parameters_definition":
+                seen_sections.add("Parameters")
                 self.parameters = {}
                 self.named_poses = {}
                 for param in child.children:
@@ -650,8 +666,9 @@ class RobotManager:
                 print("✅ Extracted Named Poses:", self.named_poses)
 
             # ————————————————
-            # 6) Assembly (workflow) definitions
+            # 7) Assembly (workflow) definitions
             elif child.data == "assembly_definition":
+                seen_sections.add("Assembly")
                 for command in child.children:
                     control_type = command.children[0].value
                     action_node = command.children[1]
@@ -862,6 +879,11 @@ class RobotManager:
             print(f"❌ Unknown PLC building block '{block_name}'. Allowed blocks: {sorted(BUILDING_BLOCKS)}")
             return
 
+        confirm_text = f"Execute PLC block '{resolved}' with parameters {payload}?"
+        if not self.http_client.confirm_workflow(confirm_text):
+            print(f"Skipped '{resolved}' due to user rejection.")
+            return
+
         try:
             result = self.plc_client.call_block(resolved, payload)
         except Exception as exc:
@@ -870,6 +892,14 @@ class RobotManager:
 
         if not result.get("success", False):
             print(f"⚠️ PLC reported failure for '{resolved}': {result}")
+
+    def _ensure_simulation_sections(self, seen_sections: set[str]):
+        missing = []
+        for section in ("Agents", "Locations", "Trays", "Assembly"):
+            if section not in seen_sections:
+                missing.append(section)
+        if missing:
+            raise DSLValidationError([f"Section(s) {', '.join(missing)} are required in simulation mode."])
 
     def _validate_trays(self, trays):
         errors = []

@@ -2,14 +2,43 @@ This repo is simulation the kuka robot cell of 2 kuka robots and he rl convayor.
 Simulation with the mujoco sim ros2 controllers and the moveit2 pkg later on coneecting the Previus DSL codes 
 
 
-relevant CMDS : 
-
-ch kr20_kr120_moveit_config viz.launch.py
 
 
+
+
+--for launch mujoco sim--
 ros2 launch kr20_kr120_mujoco kuka_cell.launch.py
 
+--for launch moveit--
+ros2 launch kr20_kr120_moveit_config viz.launch.py
+ 
+--for launch cpp coordinator--
+ros2 launch kr20_kr120_moveit_demos coordinator.launch.py
 
+--for launch dsl parser real and sim--
+python3 -m ros_http_bridge2.ros_http_bridge_rclpy
+
+--for launch ros2 -> plc bridge--
+./launch.bash
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ros controller test CMDS : 
 
 ros2 action send_goal   /kr20_arm_controller/follow_joint_trajectory   control_msgs/action/FollowJointTrajectory   "{trajectory: {
       joint_names: [

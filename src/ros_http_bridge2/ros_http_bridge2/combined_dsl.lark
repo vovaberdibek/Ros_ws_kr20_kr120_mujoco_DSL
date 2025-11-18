@@ -1,5 +1,5 @@
 
-start: mode_definition agents_definition locations_definition trays_definition parameters_definition? tray_step_poses_definition? main_poses_definition? assembly_definition
+start: mode_definition agents_definition? locations_definition? trays_definition? parameters_definition? tray_step_poses_definition? main_poses_definition? assembly_definition
 
 mode_definition: "Mode" ":" MODE_VALUE
 MODE_VALUE: "simulation" | "real"
