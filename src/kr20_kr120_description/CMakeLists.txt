@@ -21,6 +21,8 @@ install(DIRECTORY gazebo_assets/ DESTINATION share/${PROJECT_NAME}/gazebo_assets
 # Install ALL MuJoCo stuff recursively (XML + meshes + .obj/.stl/.dae/.mtl)
 install(DIRECTORY mujoco/ DESTINATION share/${PROJECT_NAME}/mujoco)
 
+install(FILES model.config resource_placeholder.sdf
+  DESTINATION share/${PROJECT_NAME})
+
 
 ament_package()
-

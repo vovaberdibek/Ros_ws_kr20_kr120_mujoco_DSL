@@ -15,6 +15,7 @@
 #include <custom_interfaces/srv/init_parameters.hpp>
 #include <custom_interfaces/srv/pick_tray.hpp>
 #include <custom_interfaces/srv/place_tray.hpp>
+#include <custom_interfaces/srv/position_tray.hpp>
 #include <custom_interfaces/srv/internal_screwing_sequence.hpp>
 #include <custom_interfaces/srv/internal_screw_by_num.hpp>
 #include <tf2/LinearMath/Matrix3x3.h>
@@ -220,6 +221,7 @@ class CoordinatorNode : public rclcpp::Node {
   using InitParameters = custom_interfaces::srv::InitParameters;
   using PickTray = custom_interfaces::srv::PickTray;
   using PlaceTray = custom_interfaces::srv::PlaceTray;
+  using PositionTray = custom_interfaces::srv::PositionTray;
   using InternalScrewingSequence = custom_interfaces::srv::InternalScrewingSequence;
   using InternalScrewByNum = custom_interfaces::srv::InternalScrewByNum;
 
@@ -256,6 +258,9 @@ public:
     place_srv_ = create_service<PlaceTray>(
         "place_tray",
         std::bind(&CoordinatorNode::handlePlaceTray, this, _1, _2));
+    position_srv_ = create_service<PositionTray>(
+        "position_tray",
+        std::bind(&CoordinatorNode::handlePositionTray, this, _1, _2));
     screw_srv_ = create_service<InternalScrewingSequence>(
         "internal_screwing_sequence",
         std::bind(&CoordinatorNode::handleInternalScrewing, this, _1, _2));
@@ -374,6 +379,29 @@ private:
     }
   }
 
+  void handlePositionTray(
+      const std::shared_ptr<PositionTray::Request> request,
+      std::shared_ptr<PositionTray::Response> response) {
+    if (!ensureReady("position_tray", response)) {
+      response->message = "System not ready";
+      return;
+    }
+
+    if (request->index < 0 ||
+        static_cast<std::size_t>(request->index) >= context_->tray_step_poses.size()) {
+      response->success = false;
+      response->message = "Tray index out of range";
+      RCLCPP_ERROR(get_logger(),
+                   "PositionTray rejected: tray index %d invalid.",
+                   request->index);
+      return;
+    }
+
+    bool ok = moveToTrayPose(static_cast<std::size_t>(request->index));
+    response->success = ok;
+    response->message = ok ? "Tray positioned" : "Failed to reach tray pose";
+  }
+
   void handleInternalScrewing(
       const std::shared_ptr<InternalScrewingSequence::Request> request,
       std::shared_ptr<InternalScrewingSequence::Response> response) {
@@ -430,6 +458,27 @@ private:
     waitForStateUpdate();
     ok &= kr120::motion::executeLinearPath(*kr120_arm_group_,
                                            {ctx.pre_end_pose}, 0.01, 0.0);
+    waitForStateUpdate();
+    return ok;
+  }
+
+  bool moveToTrayPose(std::size_t index) {
+    if (index >= context_->tray_step_poses.size()) {
+      RCLCPP_ERROR(get_logger(),
+                   "Tray index %zu out of bounds (tray poses: %zu).",
+                   index,
+                   context_->tray_step_poses.size());
+      return false;
+    }
+
+    const auto &tray_pose = context_->tray_step_poses.at(index);
+    geometry_msgs::msg::Pose target;
+    target.orientation = rpyToQuaternion(tray_pose[0], tray_pose[1], tray_pose[2]);
+    target.position.x = tray_pose[3];
+    target.position.y = tray_pose[4];
+    target.position.z = tray_pose[5];
+
+    bool ok = kr120::motion::executeRRT(*kr120_arm_group_, target);
     waitForStateUpdate();
     return ok;
   }
@@ -555,6 +604,7 @@ private:
   rclcpp::Service<InitParameters>::SharedPtr init_srv_;
   rclcpp::Service<PickTray>::SharedPtr pick_srv_;
   rclcpp::Service<PlaceTray>::SharedPtr place_srv_;
+  rclcpp::Service<PositionTray>::SharedPtr position_srv_;
   rclcpp::Service<InternalScrewingSequence>::SharedPtr screw_srv_;
   rclcpp::Service<InternalScrewByNum>::SharedPtr screw_single_srv_;
 

@@ -94,9 +94,9 @@ assembly_command: CONTROL_TYPE (add_tray | pick_tray | operator_position_tray | 
 
 add_tray: "AddTray" named_arg named_arg
 operator_position_tray: "OperatorPositionTray" named_arg
-recharge_sequence: "RechargeSequence" named_arg
+recharge_sequence: "RechargeSequence" named_arg+
 internal_screw_unit_hole: ("InternalScrew" | "ScrewByNum") named_arg named_arg
-internal_screwing_sequence: "InternalScrewingSequence" named_arg
+internal_screwing_sequence: "InternalScrewingSequence" named_arg+
 external_screwing_sequence: "ExternalScrewingSequence" named_arg
 pick_tray: "PickTray" named_arg
 place_tray: "PlaceTray" named_arg
@@ -104,7 +104,7 @@ call_block: "CallBlock" named_arg+
 
 load_tray: "LoadTray" named_arg named_arg
 bring_tray: "BringTray" named_arg named_arg named_arg
-position_tray: "PositionTray" named_arg
+position_tray: "PositionTray" named_arg+
 initial_assemble: "InitialAssemble" named_arg named_arg
 finish_assemble: "FinishAssemble" named_arg named_arg named_arg
 

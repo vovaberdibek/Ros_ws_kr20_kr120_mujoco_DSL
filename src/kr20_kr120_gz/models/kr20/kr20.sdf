@@ -1,4 +1,4 @@
-<sdf version='1.11'>
+<sdf version='1.7'>
   <model name='kr20_kr120'>
     <joint name='fixed_pareti' type='fixed'>
       <pose relative_to='__model__'>-0.048500000000000001 -0.54049999999999998 0 -1.5708 -5.5511151231257827e-17 -1.5708</pose>
@@ -24,7 +24,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://kr20_kr120_description/collision/pareti.stl</uri>
+            <uri>model://kr20_kr120_gz/models/collision/pareti.stl</uri>
           </mesh>
         </geometry>
       </collision>
@@ -33,7 +33,7 @@
         <geometry>
           <mesh>
             <scale>0.001 0.001 0.001</scale>
-            <uri>model://kr20_kr120_description/visual/pareti.dae</uri>
+            <uri>model://kr20_kr120_gz/models/visual/pareti.dae</uri>
           </mesh>
         </geometry>
       </visual>
@@ -1353,15 +1353,15 @@
     <link name='rl_base'>
       <pose relative_to='rl_fixed'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.096702999999999997 0 0.65625 0 0 1.5708</pose>
-        <mass>1000</mass>
+        <pose>0.096702999999999997 0 0.65625 0 0 0</pose>
+        <mass>200</mass>
         <inertia>
-          <ixx>0.10000000000000001</ixx>
-          <ixy>0.10000000000000001</ixy>
-          <ixz>0.10000000000000001</ixz>
-          <iyy>0.10000000000000001</iyy>
-          <iyz>0.10000000000000001</iyz>
-          <izz>0.10000000000000001</izz>
+          <ixx>80</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>80</iyy>
+          <iyz>0</iyz>
+          <izz>20</izz>
         </inertia>
       </inertial>
       <collision name='rl_base_collision'>
@@ -1413,15 +1413,15 @@
     <link name='rl_lifter'>
       <pose relative_to='rl_base__lifter'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>-0.34549999999999997 0 -0.02 1.5708 -5.5511151231257827e-17 1.5708</pose>
-        <mass>100</mass>
+        <pose>-0.34549999999999997 0 -0.02 0 0 0</pose>
+        <mass>40</mass>
         <inertia>
-          <ixx>0.10000000000000001</ixx>
-          <ixy>0.10000000000000001</ixy>
-          <ixz>0.10000000000000001</ixz>
-          <iyy>0.10000000000000001</iyy>
-          <iyz>0.10000000000000001</iyz>
-          <izz>0.10000000000000001</izz>
+          <ixx>6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>6</iyy>
+          <iyz>0</iyz>
+          <izz>3</izz>
         </inertia>
       </inertial>
       <collision name='rl_lifter_collision'>
@@ -1474,14 +1474,14 @@
       <pose relative_to='rl_base__slider'>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0.47299999999999998 0 0 0</pose>
-        <mass>100</mass>
+        <mass>20</mass>
         <inertia>
-          <ixx>0.10000000000000001</ixx>
-          <ixy>0.10000000000000001</ixy>
-          <ixz>0.10000000000000001</ixz>
-          <iyy>0.10000000000000001</iyy>
-          <iyz>0.10000000000000001</iyz>
-          <izz>0.10000000000000001</izz>
+          <ixx>4</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>4</iyy>
+          <iyz>0</iyz>
+          <izz>1.5</izz>
         </inertia>
       </inertial>
       <collision name='rl_slider_collision'>
@@ -1532,14 +1532,14 @@
       <pose relative_to='rl_slider__plate'>0 0 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0.47299999999999998 0 0 0</pose>
-        <mass>100</mass>
+        <mass>30</mass>
         <inertia>
-          <ixx>0.10000000000000001</ixx>
-          <ixy>0.10000000000000001</ixy>
-          <ixz>0.10000000000000001</ixz>
-          <iyy>0.10000000000000001</iyy>
-          <iyz>0.10000000000000001</iyz>
-          <izz>0.10000000000000001</izz>
+          <ixx>5</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>5</iyy>
+          <iyz>0</iyz>
+          <izz>2</izz>
         </inertia>
       </inertial>
       <collision name='rl_plate_collision'>
@@ -1570,21 +1570,6 @@
       </visual>
       <gravity>false</gravity>
     </link>
-    <plugin name='gazebo_grasp_fix' filename='libgazebo_grasp_fix.so'>
-      <arm>
-        <arm_name>kr120_pinza</arm_name>
-        <palm_link>kr120_pinza_right</palm_link>
-        <palm_link>kr120_pinza_left</palm_link>
-        <gripper_link>kr120_gyro_left</gripper_link>
-        <gripper_link>kr120_gyro_right</gripper_link>
-      </arm>
-      <update_rate>50</update_rate>
-      <grip_count_threshold>4</grip_count_threshold>
-      <max_grip_count>25</max_grip_count>
-      <release_tolerance>0.0045</release_tolerance>
-      <disable_collision_on_attach>true</disable_collision_on_attach>
-      <contact_topic>__default_topic__</contact_topic>
-    </plugin>
     <plugin name='gazebo_ros2_control' filename='libgazebo_ros2_control.so'/>
     <frame name='kr120_base' attached_to='kr120_basamento'>
       <pose>0 0 0 0 0 0</pose>

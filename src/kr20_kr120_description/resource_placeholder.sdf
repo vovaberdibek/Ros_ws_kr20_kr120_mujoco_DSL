@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<sdf version="1.7">
+  <model name="kr20_kr120_description_resources">
+    <static>true</static>
+    <link name="dummy">
+      <inertial>
+        <mass>1e-6</mass>
+        <inertia>
+          <ixx>1e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-6</iyy>
+          <iyz>0</iyz>
+          <izz>1e-6</izz>
+        </inertia>
+      </inertial>
+      <collision name="dummy_collision">
+        <geometry>
+          <sphere>
+            <radius>1e-6</radius>
+          </sphere>
+        </geometry>
+      </collision>
+      <visual name="dummy_visual">
+        <geometry>
+          <sphere>
+            <radius>1e-6</radius>
+          </sphere>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

@@ -86,61 +86,11 @@ MainPoses:
     PreEnd: [0.0, -1.43, 2.582, 0, 1.57, 0]
 
 Assembly:
-    manual AddTray tray tray_aoc object MTQ_MAG 
+    manual AddTray tray tray_aoc object MTQ12
     manual PickTray location Table 
     manual OperatorPositionTray location OperatorStation 
-    manual PositionTray index 0 
-    manual RechargeSequence index 0 
+    manual PositionTray unit MTQ12 
+    manual RechargeSequence unit MTQ12 
     manual InternalScrewingSequence index 2 
     manual InternalScrew unit MTQ12 hole 82
     manual PlaceTray location AssemblyArea 
-
-    manual AddTray tray tray_aoc object CMG34 
-    manual PickTray location Table 
-    manual OperatorPositionTray location OperatorStation 
-    manual PositionTray index 1 
-    manual RechargeSequence index 1 
-    manual InternalScrewingSequence index 1 
-    
-    manual AddTray tray tray_aoc object CMG34 
-    manual OperatorPositionTray location OperatorStation 
-    manual PositionTray index 4 
-    manual RechargeSequence index 4 
-    manual InternalScrewingSequence index 4                      
-    manual PlaceTray location AssemblyArea
-
-    manual AddTray tray tray_dhc object none 
-    manual PickTray location Table 
-    manual OperatorPositionTray location OperatorStation    
-    manual PositionTray index 0 
-    manual RechargeSequence index 0 
-    manual InternalScrewingSequence index 0 
-    manual PlaceTray location AssemblyArea
-    
-
-    manual AddTray tray tray_eps object BAT1
-    manual PickTray location Table 
-    manual OperatorPositionTray location OperatorStation     
-    manual PositionTray index 5 
-    manual RechargeSequence index 5 
-    manual InternalScrewingSequence index 5 
-    manual AddTray tray tray_eps object BAT2                 
-    manual PickTray location Table 
-    manual OperatorPositionTray location OperatorStation 
-    manual PositionTray index 6 
-    manual RechargeSequence index 6 
-    manual InternalScrewingSequence index 6 
-    manual AddTray tray tray_eps object PCDU 
-    manual OperatorPositionTray location OperatorStation 
-    manual PositionTray index 7 
-    manual RechargeSequence index 7 
-    manual InternalScrewingSequence index 7 
-    manual PlaceTray location AssemblyArea
-
-    manual AddTray tray tray_payload object none 
-    manual PickTray location Table 
-    manual OperatorPositionTray location OperatorStation    
-    manual PositionTray index 0 
-    manual RechargeSequence index 0 
-    manual InternalScrewingSequence index 0 
-    manual PlaceTray location AssemblyArea

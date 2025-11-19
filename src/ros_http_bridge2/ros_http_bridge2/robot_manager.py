@@ -421,6 +421,7 @@ class PLCClient:
         )
 
 class RobotManager:
+    UNIT_INDEX_ACTIONS = {"PositionTray", "RechargeSequence", "InternalScrewingSequence"}
     ACTION_PARAM_SCHEMAS = {
         "AddTray": {"required": {"tray": str, "object": str}},
         "InternalScrewUnitHole": {"required": {"unit": str, "hole": int}},
@@ -853,6 +854,30 @@ class RobotManager:
             result[key] = value
         return result
 
+    def _resolve_unit_pose_index(self, unit_name: str, action: str):
+        entry = self.unit_lookup.get(unit_name)
+        if not entry:
+            print(f"❌ Action '{action}' references unknown unit '{unit_name}'.")
+            return None
+        pose_index = entry.get("pose_index")
+        if pose_index is None:
+            print(f"❌ Unit '{unit_name}' does not define a pose_index.")
+            return None
+        return int(pose_index)
+
+    def _maybe_inject_unit_index(self, action: str, named_params: Dict[str, Any]):
+        if action not in self.UNIT_INDEX_ACTIONS or not isinstance(named_params, dict):
+            return named_params
+        if "index" in named_params or "unit" not in named_params:
+            return named_params
+        unit_name = str(named_params["unit"])
+        pose_index = self._resolve_unit_pose_index(unit_name, action)
+        if pose_index is None:
+            return None
+        clone = dict(named_params)
+        clone["index"] = pose_index
+        return clone
+
     def _plc_log(self, message: str):
         print(f"[PLC] {message}")
 
@@ -1027,6 +1052,12 @@ class RobotManager:
         else:
             named_params = {}
             positional_params = []
+
+        if isinstance(named_params, dict) and named_params:
+            injected = self._maybe_inject_unit_index(action, named_params)
+            if injected is None:
+                return
+            named_params = injected
 
         # … code that replaces tray names with objects, digits → ints, etc. …
 
