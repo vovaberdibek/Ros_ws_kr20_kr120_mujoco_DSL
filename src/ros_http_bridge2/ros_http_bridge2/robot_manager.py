@@ -1,4 +1,3 @@
-from lark import Tree, Token
 import queue
 import threading
 import requests
@@ -11,6 +10,7 @@ from typing import Any, Dict, List, Optional, Callable
 from pydantic import ValidationError
 
 from .dsl_models import TrayModel, DSLValidationError
+from .dsl_parser import DSLParser, WorkflowArtifacts
 
 
 BASE_URL = "http://localhost:8000"
@@ -428,7 +428,7 @@ class RobotManager:
         "CallBlock": {"required": {"name": str}},
     }
 
-    def __init__(self, parsed_tree):
+    def __init__(self, parsed_spec):
         self.http_client = RobotHTTPClient()
         self.mode = "simulation"
         self.plc_client: Optional[PLCClient] = None
@@ -451,8 +451,23 @@ class RobotManager:
         self.named_poses = {}
         self.parameters = {}
 
-        # Build workflow, trays, locations exactly as before
-        self.workflow, self.trays, self.locations = self.build_workflow(parsed_tree)
+        parser = DSLParser()
+        if isinstance(parsed_spec, WorkflowArtifacts):
+            artifacts = parsed_spec
+        else:
+            artifacts = parser.build(parsed_spec)
+
+        self.mode = artifacts.mode or "simulation"
+        self.agents = artifacts.agents
+        self.workflow = artifacts.workflow
+        self.trays = artifacts.trays
+        self.locations = artifacts.locations
+        self.tray_step_poses = artifacts.tray_step_poses
+        self.main_poses = artifacts.main_poses
+        self.named_poses = artifacts.named_poses
+        self.parameters = artifacts.parameters
+        self.location_order = artifacts.location_order
+        self.location_name_to_index = artifacts.location_name_to_index
 
         # Construct the same "params" dictionary you used in ROS version
         params = {
@@ -477,16 +492,16 @@ class RobotManager:
         }
 
         if self.mode == "simulation":
-            # 2) Immediately send them over HTTP
+            self._validate_trays(self.trays)
+            self._validate_workflow_symbols(self.workflow)
+
             print("📤 Sending InitParameters to HTTP bridge (and thus to ROS)…")
             success = self.http_client.send_init_parameters(params)
             if not success:
                 raise RuntimeError("InitParameters call failed (returned False)")
 
-            # 3) Now it’s safe to continue; tasks will be executed later
             print("✅ InitParameters succeeded. RobotManager ready to run workflow.")
 
-            # Recompute Recharge pose exactly as you did in C++/ROS version:
             table = params['main_poses'].get('Table', [0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             tip   = params.get('tip_offset', [0.0, 0.0, 0.0])
             recharge = [
@@ -497,14 +512,15 @@ class RobotManager:
             ]
             params['main_poses']['Recharge'] = recharge
 
-            # Debug print just like before
             print("📤 Sending DSL runtime parameters via HTTP...")
             print(json.dumps(params, indent=2))
-
-            # HTTP call replaces rospy.ServiceProxy('init_parameters', ...)
             self.http_client.send_init_parameters(params)
         else:
             print("🛠️ Real robot mode selected. Skipping HTTP init and creating PLC client…")
+            self.tray_models = {}
+            self.unit_lookup = {}
+            self.tray_names = set()
+            self.unit_names = set()
             self.plc_client = PLCClient(logger=self._plc_log)
 
     def to_camel_case(self, snake_str):
@@ -512,300 +528,18 @@ class RobotManager:
         return ''.join(x.capitalize() for x in components)
 
     def build_workflow(self, tree):
-        """
-        Replicate your full DSL parsing logic exactly:
-        - locations_definition
-        - trays_definition (with units, screws, height, initial/operator/final poses)
-        - tray_step_poses_definition
-        - main_poses_definition
-        - parameters_definition (tip_offset, tray_angles, named_pose_entry, vector3, int_list, etc.)
-        - assembly_definition (control_type, action, params, repeat, speed)
-        """
-        if tree is None:
-            print("No tree provided, returning empty workflow, trays, and locations.")
-            return [], {}, {}
+        parser = DSLParser()
+        artifacts = parser.build(tree)
+        self.mode = artifacts.mode or self.mode
+        self.tray_step_poses = artifacts.tray_step_poses
+        self.main_poses = artifacts.main_poses
+        self.named_poses = artifacts.named_poses
+        self.parameters = artifacts.parameters
+        self.location_order = artifacts.location_order
+        self.location_name_to_index = artifacts.location_name_to_index
+        return artifacts.workflow, artifacts.trays, artifacts.locations
 
-        workflow = []
-        trays = {}
-        locations = {}
 
-        # Reset storage
-        self.tray_step_poses = []
-        self.main_poses = {}
-        self.named_poses = {}
-        self.parameters = {}
-        seen_sections: set[str] = set()
-
-        for child in tree.children:
-            # ————————————————
-            # 0) Mode header
-            if child.data == "mode_definition":
-                mode_token = child.children[0]
-                self.mode = mode_token.value if isinstance(mode_token, Token) else "simulation"
-                print(f"🛠️ DSL mode set to '{self.mode}'.")
-                continue
-
-            # ————————————————
-            # 1) Agents (ignored but tracked for validation)
-            if child.data == "agents_definition":
-                seen_sections.add("Agents")
-                continue
-
-            # ————————————————
-            # 2) Locations
-            if child.data == "locations_definition":
-                seen_sections.add("Locations")
-                for loc in child.children:
-                    loc_name = loc.children[0].value
-                    position = [float(n.value) for n in loc.children[1].children]
-                    orientation = [float(n.value) for n in loc.children[2].children]
-                    locations[loc_name] = {
-                        "position": position,
-                        "orientation": orientation
-                    }
-                    if loc_name not in self.location_name_to_index:
-                        idx = len(self.location_order)
-                        self.location_order.append(loc_name)
-                        self.location_name_to_index[loc_name] = idx
-
-            # ————————————————
-            # 3) Trays (with all nested attributes)
-            elif child.data == "trays_definition":
-                seen_sections.add("Trays")
-                for tray in child.children:
-                    tray_name = tray.children[0].value
-                    tray_data = {
-                        "name":         tray_name,
-                        "units":        [],
-                        "screws":       [],
-                        "tray":         None,
-                        "height":       None,
-                        "initial_pose": None,
-                        "operator_pose":None,
-                        "final_pose":   None
-                    }
-                    for attr in tray.children[1:]:
-                        if isinstance(attr, Tree) and attr.data == "tray_attribute":
-                            inner = attr.children[0]
-                            if inner.data == "tray_line":
-                                tray_data["tray"] = inner.children[0].value
-                            elif inner.data == "units_def":
-                                tray_data["units"] = [
-                                    self._parse_unit_tree(unit)
-                                    for unit in inner.children
-                                    if unit.data == "unit"
-                                ]
-                            elif inner.data == "screws_def":
-                                screws_list = [
-                                    {
-                                        "quantity": int(screw.children[0].value),
-                                        "type":     screw.children[1].value
-                                    }
-                                    for screw in inner.children
-                                ]
-                                tray_data["screws"] = screws_list
-                            elif inner.data == "height_def":
-                                tray_data["height"] = float(inner.children[0].value)
-                            elif inner.data == "initial_pose":
-                                tray_data["initial_pose"] = [float(n.value) for n in inner.children[0].children]
-                            elif inner.data == "operator_pose":
-                                tray_data["operator_pose"] = [float(n.value) for n in inner.children[0].children]
-                            elif inner.data == "final_pose":
-                                tray_data["final_pose"] = [float(n.value) for n in inner.children[0].children]
-                    trays[tray_name] = tray_data
-
-            # ————————————————
-            # 4) Tray Step Poses
-            elif child.data == "tray_step_poses_definition":
-                seen_sections.add("TrayStepPoses")
-                self.tray_step_poses = [
-                    [float(n.value) for n in entry.children[0].children]
-                    for entry in child.children
-                ]
-
-            # ————————————————
-            # 5) Main Poses
-            elif child.data == "main_poses_definition":
-                seen_sections.add("MainPoses")
-                self.main_poses = {
-                    pose.children[0].value: [float(n.value) for n in pose.children[1].children]
-                    for pose in child.children
-                }
-
-            # ————————————————
-            # 6) Parameters (tip_offset, tray_angles, named_pose_entry, vector3/int_list/float_list, etc.)
-            elif child.data == "parameters_definition":
-                seen_sections.add("Parameters")
-                self.parameters = {}
-                self.named_poses = {}
-                for param in child.children:
-                    if len(param.children) == 0:
-                        continue
-                    param_entry = param.children[0]
-                    # Named pose entries
-                    if param_entry.data == "named_pose_entry":
-                        pose_name   = param_entry.children[0].value
-                        pose_values = [float(n.value) for n in param_entry.children[1].children]
-                        self.named_poses[pose_name] = pose_values
-                        continue
-
-                    # Otherwise, vector3, vector2, vector6, int_list, float_list
-                    param_name = param_entry.data
-                    inner = param_entry.children[0]
-                    if inner.data in {"vector3", "vector2", "vector6"}:
-                        values = [float(n.value) for n in inner.children]
-                    elif inner.data == "int_list":
-                        values = [int(n.value) for n in inner.children]
-                    elif inner.data == "float_list":
-                        values = [float(n.value) for n in inner.children]
-                    else:
-                        print(f"⚠️ Unhandled parameter type '{inner.data}' for param '{param_name}'")
-                        continue
-                    self.parameters[param_name] = values
-
-                print("✅ Extracted Parameters:", self.parameters)
-                print("✅ Extracted Named Poses:", self.named_poses)
-
-            # ————————————————
-            # 7) Assembly (workflow) definitions
-            elif child.data == "assembly_definition":
-                seen_sections.add("Assembly")
-                for command in child.children:
-                    control_type = command.children[0].value
-                    action_node = command.children[1]
-                    if not isinstance(action_node, Tree):
-                        print(f"⚠️ Unexpected action node type: {type(action_node).__name__}")
-                        continue
-
-                    action = self.to_camel_case(action_node.data)
-
-                    named_params = self._named_args_to_dict(action_node)
-                    if action in self.ACTION_PARAM_SCHEMAS:
-                        params_obj = named_params
-                    else:
-                        if named_params:
-                            params_obj = named_params
-                        else:
-                            params_obj = []
-                            for p in getattr(action_node, "children", []):
-                                if p is None:
-                                    continue
-                                params_obj.append(self._literal_from_node(p))
-
-                    workflow.append({
-                        "control_type": control_type,
-                        "action":       action,
-                        "params":       params_obj,
-                    })
-
-        if self.mode == "simulation":
-            self._validate_trays(trays)
-            self._validate_workflow_symbols(workflow)
-        else:
-            self.tray_models = {}
-            self.unit_lookup = {}
-            self.tray_names = set()
-            self.unit_names = set()
-
-        print("Extracted Trays:", trays)
-        print("Extracted Locations:", locations)
-        print("Extracted Tray Step Poses:", self.tray_step_poses)
-        print("Extracted Main Poses:", self.main_poses)
-        print("Extracted Named Poses:", self.named_poses)
-
-        return workflow, trays, locations
-
-    def _parse_unit_tree(self, unit_node: Tree) -> Dict[str, Any]:
-        unit_info: Dict[str, Any] = {}
-        for child in unit_node.children:
-            if not isinstance(child, Tree) or child.data != "unit_field":
-                continue
-            key_token = child.children[0]
-            value_node = child.children[1]
-            value = self._parse_unit_value(value_node)
-            unit_info[key_token.value] = value
-        return unit_info
-
-    def _parse_unit_value(self, node):
-        if isinstance(node, Token):
-            if node.type == "INT":
-                return int(node.value)
-            return node.value
-        if isinstance(node, Tree):
-            if node.data == "unit_value" and node.children:
-                return self._parse_unit_value(node.children[0])
-            if node.data == "screw_block":
-                return self._parse_screw_block(node)
-            if node.data == "int_list":
-                return [int(tok.value) for tok in node.children if isinstance(tok, Token)]
-            if node.data == "float_list":
-                return [float(tok.value) for tok in node.children if isinstance(tok, Token)]
-            if node.data == "vector6":
-                return [float(tok.value) for tok in node.children]
-        return str(node)
-
-    def _parse_screw_block(self, block_node: Tree) -> Dict[str, Any]:
-        data: Dict[str, Any] = {}
-        for field in block_node.children:
-            if not isinstance(field, Tree):
-                continue
-            inner = field.children[0] if field.children else None
-            if not isinstance(inner, Tree):
-                continue
-
-            if inner.data == "manual_field":
-                int_list = inner.children[0] if inner.children else None
-                data["manual_indices"] = [
-                    int(tok.value) for tok in getattr(int_list, "children", []) if isinstance(tok, Token)
-                ]
-            elif inner.data == "auto_field":
-                int_list = inner.children[0] if inner.children else None
-                data["auto_indices"] = [
-                    int(tok.value) for tok in getattr(int_list, "children", []) if isinstance(tok, Token)
-                ]
-            elif inner.data == "positions_field":
-                vector_group = inner.children[0] if inner.children else None
-                poses = []
-                for vec in getattr(vector_group, "children", []):
-                    if isinstance(vec, Tree) and vec.data == "vector6":
-                        poses.append([float(tok.value) for tok in vec.children])
-                data["positions"] = poses
-        return data
-
-    def _literal_from_node(self, node):
-        if isinstance(node, Token):
-            if node.type == "INT":
-                return int(node.value)
-            if node.type == "NUMBER":
-                return float(node.value)
-            if node.type == "STRING":
-                return node.value.strip("\"")
-            if node.type == "FLOAT":
-                return float(node.value)
-            return node.value
-        if isinstance(node, Tree):
-            if hasattr(node, "value"):
-                return node.value
-            if getattr(node, "children", None):
-                return self._literal_from_node(node.children[0])
-        return str(node)
-
-    def _named_args_to_dict(self, action_node: Tree) -> Dict[str, Any]:
-        params: Dict[str, Any] = {}
-        for child in getattr(action_node, "children", []):
-            if not isinstance(child, Tree) or child.data != "named_arg":
-                continue
-            if len(child.children) < 2:
-                continue
-            key_token = child.children[0]
-            value_node = child.children[1]
-            key = key_token.value
-            if key in params:
-                raise DSLValidationError([
-                    f"Duplicate parameter '{key}' provided for action '{self.to_camel_case(action_node.data)}'."
-                ])
-            params[key] = self._literal_from_node(value_node)
-        return params
 
     def _get_named_param(self, named_params: Dict[str, Any], key: str, action: str):
         if key not in named_params:

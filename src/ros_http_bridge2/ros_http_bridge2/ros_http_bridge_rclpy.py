@@ -47,34 +47,16 @@ app.add_middleware(
 )
 
 # --------- Models ----------
-class InitParamsModel(BaseModel):
-    params: dict
-
-class BringTrayModel(BaseModel):
-    tray_name: str
-    location: str
-    agent: str
-
-class IndexModel(BaseModel):
-    index: int
-
-class AddTray2Model(BaseModel):
-    tray_name: str
-    object_name: str
-
-class ConfirmModel(BaseModel):
-    task_description: str
-
-class ConfirmResponseModel(BaseModel):
-    ok: bool
-
-class RunModel(BaseModel):
-    dsl: str
-    screwHoles: Optional[Dict[str, List[Dict[str,Any]]]] = None
-
-class InternalScrewByNumModel(BaseModel):
-    index: int
-    ScrewNum: int
+from .dsl_models import (
+    InitParamsModel,
+    BringTrayModel,
+    IndexModel,
+    AddTray2Model,
+    ConfirmModel,
+    ConfirmResponseModel,
+    RunModel,
+    InternalScrewByNumModel,
+)
 
 # ---- Confirmation state (shared with RobotManager monkey-patch) ----
 confirm_event = threading.Event()

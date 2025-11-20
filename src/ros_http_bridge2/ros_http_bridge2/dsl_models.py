@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -53,3 +53,41 @@ class DSLValidationError(RuntimeError):
 
     def __init__(self, errors: List[str]):
         super().__init__("\n".join(errors))
+
+
+# FastAPI/Pydantic DTOs used by the HTTP bridge
+class InitParamsModel(BaseModel):
+    params: Dict[str, Any]
+
+
+class BringTrayModel(BaseModel):
+    tray_name: str
+    location: str
+    agent: str
+
+
+class IndexModel(BaseModel):
+    index: int
+
+
+class AddTray2Model(BaseModel):
+    tray_name: str
+    object_name: str
+
+
+class ConfirmModel(BaseModel):
+    task_description: str
+
+
+class ConfirmResponseModel(BaseModel):
+    ok: bool
+
+
+class RunModel(BaseModel):
+    dsl: str
+    screwHoles: Optional[Dict[str, List[Dict[str, Any]]]] = None
+
+
+class InternalScrewByNumModel(BaseModel):
+    index: int
+    ScrewNum: int
