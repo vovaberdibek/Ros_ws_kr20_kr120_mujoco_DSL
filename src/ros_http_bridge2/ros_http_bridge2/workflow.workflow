@@ -86,11 +86,11 @@ MainPoses:
     PreEnd: [0.0, -1.43, 2.582, 0, 1.57, 0]
 
 Assembly:
-    manual AddTray tray tray_aoc object MTQ12
-    manual PickTray location Table 
-    manual OperatorPositionTray location OperatorStation 
-    manual PositionTray unit MTQ12 
-    manual RechargeSequence unit MTQ12 
-    manual InternalScrewingSequence index 2 
-    manual InternalScrew unit MTQ12 hole 82
-    manual PlaceTray location AssemblyArea 
+    AMR1 addTray: tray_AOCS to AssemblyArea ToConfirm;
+    Robot1 pickTray: from Table ToConfirm;
+    HumanOP1 operatorPositionTray: to OperatorStation ToConfirm;
+    Robot1 positionTray: unit MTQ12 ToConfirm;
+    Robot1 rechargeSequence: unit MTQ12 ToConfirm;
+    Robot1 internalScrewingSequence: index 2 ToConfirm;
+    Robot1 internalScrew: unit MTQ12 hole 82 ToConfirm;
+    Robot1 placeTray: to AssemblyArea ToConfirm;

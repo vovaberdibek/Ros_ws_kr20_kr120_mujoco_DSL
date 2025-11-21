@@ -7,6 +7,31 @@ from lark import Tree, Token
 from .dsl_models import DSLValidationError
 
 
+ACTION_PARAM_ORDER = {
+    "AddTray": ["tray", "object"],
+    "PickTray": ["location"],
+    "OperatorPositionTray": ["location"],
+    "PositionTray": ["unit"],
+    "RechargeSequence": ["unit"],
+    "InternalScrewingSequence": ["index"],
+    "InternalScrew": ["unit", "hole"],
+    "PlaceTray": [],
+    "ScrewPickup": ["screw"],
+    "LoadTray": ["load"],
+    "DepositTray": [],
+    "MrHoming": [],
+    "SrHoming": [],
+    "PositionerRotate": ["clockwise"],
+    "GyroGrpRot": ["direction"],
+    "Present2Op": ["side", "face"],
+    "PresentToScrew": ["side", "face"],
+    "MrTrolleyVCheck": [],
+    "MrTrolleyVCheckErrorCheck": [],
+    "StackTray": ["number"],
+    "PickUpTray": [],
+}
+
+
 @dataclass
 class WorkflowArtifacts:
     """Structured representation of the DSL input."""
@@ -133,11 +158,14 @@ class DSLParser:
             self.trays[name] = payload
 
     def _handle_tray_step_poses_definition(self, node: Tree):
-        self.tray_step_poses = [
-            [float(tok.value) for tok in pose.children]
-            for pose in node.children
-            if isinstance(pose, Tree) and pose.data == "vector6"
-        ]
+        poses: List[List[float]] = []
+        for entry in node.children:
+            vec = entry
+            if isinstance(entry, Tree) and entry.data == "tray_pose_entry" and entry.children:
+                vec = entry.children[0]
+            if isinstance(vec, Tree) and vec.data == "vector6":
+                poses.append([float(tok.value) for tok in vec.children])
+        self.tray_step_poses = poses
 
     def _handle_main_poses_definition(self, node: Tree):
         for pose in node.children:
@@ -186,37 +214,122 @@ class DSLParser:
             self.parameters[snake] = values
 
     def _handle_assembly_definition(self, node: Tree):
-        for command in node.children:
-            control_type = command.children[0].value
-            action_node = command.children[1]
-            if not isinstance(action_node, Tree):
+        for entry in node.children:
+            if not isinstance(entry, Tree) or entry.data != "assembly_command":
                 continue
-            action = self._to_camel_case(action_node.data)
-            named_params = self._named_args_to_dict(action_node)
-            if named_params:
-                params_obj: Any = named_params
+            control_clause = None
+            payload = None
+            for child in entry.children:
+                if child is None:
+                    continue
+                if isinstance(child, Tree) and child.data == "control_clause":
+                    control_clause = child
+                elif isinstance(child, Tree) and child.data in {"legacy_action", "robot_command"}:
+                    payload = child
+            if payload is None:
+                continue
+            if payload.data == "robot_command":
+                task = self._parse_robot_command(payload)
             else:
-                params_obj = [
-                    self._literal_from_node(child)
-                    for child in getattr(action_node, "children", [])
-                    if not getattr(child, "data", None) == "named_arg"
-                ]
-            task = {
-                "control_type": control_type,
-                "action": action,
-                "params": params_obj,
-            }
-            repeat = next((c.value for c in command.children if isinstance(c, Tree) and c.data == "repeat"), None)
-            if repeat:
-                task["repeat"] = int(repeat.children[0].value)
-            speed = next((c.value for c in command.children if isinstance(c, Tree) and c.data == "speed"), None)
-            if speed:
-                task["speed"] = float(speed.children[0].value)
+                control_type = "automated"
+                if control_clause and control_clause.children:
+                    control_type = control_clause.children[0].value
+                task = self._parse_legacy_command(payload, control_type)
+            if control_clause and control_clause.children and payload.data == "robot_command":
+                task["control_type"] = control_clause.children[0].value
             self.workflow.append(task)
+
+    def _parse_legacy_command(self, action_node: Tree, control_type: str) -> Dict[str, Any]:
+        action = self._to_camel_case(action_node.data)
+        named_params = self._named_args_to_dict(action_node)
+        if named_params:
+            params_obj: Any = named_params
+        else:
+            params_obj = [
+                self._literal_from_node(child)
+                for child in getattr(action_node, "children", [])
+                if not getattr(child, "data", None) == "named_arg"
+            ]
+        return {
+            "control_type": control_type,
+            "action": action,
+            "params": params_obj,
+        }
 
     # ---------------------------------------
     # Helpers
     # ---------------------------------------
+    def _parse_robot_command(self, node: Tree) -> Dict[str, Any]:
+        robot_token = node.children[0]
+        action_node = node.children[1]
+        list_node = node.children[2] if len(node.children) > 2 else None
+        robot = robot_token.value
+        action_raw = action_node.children[0].value if isinstance(action_node, Tree) and action_node.children else action_node.value
+        action = self._to_camel_case(action_raw)
+        params: Dict[str, Any] = {}
+        positional_values: List[Any] = []
+        from_loc: Optional[str] = None
+        to_loc: Optional[str] = None
+        confirm = False
+        items = getattr(list_node, "children", []) if isinstance(list_node, Tree) else []
+        for item in items:
+            inner = item
+            if isinstance(item, Tree) and item.data == "robot_command_item" and item.children:
+                inner = item.children[0]
+            if not isinstance(inner, Tree):
+                continue
+            if inner.data == "robot_param":
+                key = inner.children[0].value
+                value_node = inner.children[1] if len(inner.children) > 1 else None
+                value = self._literal_from_node(value_node)
+                params[key] = value
+            elif inner.data == "robot_positional_param":
+                value_node = inner.children[0] if inner.children else None
+                value = self._literal_from_node(value_node)
+                positional_values.append(value)
+            elif inner.data == "from_clause" and inner.children:
+                from_loc = inner.children[0].value
+            elif inner.data == "to_clause" and inner.children:
+                to_loc = inner.children[0].value
+            elif inner.data == "confirm_clause":
+                confirm = True
+
+        if positional_values:
+            ordered_keys = ACTION_PARAM_ORDER.get(action, [])
+            if not ordered_keys:
+                raise DSLValidationError(
+                    [f"Action '{action}' does not accept positional parameters. Provide explicit keys like 'param value'."]
+                )
+            key_index = 0
+            for value in positional_values:
+                # Advance to the next key that does not already have a value
+                key = None
+                while key_index < len(ordered_keys):
+                    candidate = ordered_keys[key_index]
+                    key_index += 1
+                    if candidate not in params:
+                        key = candidate
+                        break
+                if key is None:
+                    raise DSLValidationError(
+                        [
+                            f"Action '{action}' accepts at most {len(ordered_keys)} positional parameter(s); "
+                            f"no slot available for extra value '{value}'."
+                        ]
+                    )
+                params[key] = value
+
+        task = {
+            "robot": robot,
+            "action": action,
+            "params": params,
+            "from": from_loc,
+            "to": to_loc,
+            "confirm": confirm,
+            "control_type": "manual" if confirm else "automated",
+        }
+        return task
+
     def _parse_unit_tree(self, node: Tree) -> Dict[str, Any]:
         result: Dict[str, Any] = {}
         for child in node.children:
@@ -302,8 +415,12 @@ class DSLParser:
         return params
 
     def _to_camel_case(self, name: str) -> str:
-        parts = name.split("_")
-        return "".join(part.capitalize() for part in parts if part)
+        if not name:
+            return name
+        if "_" in name:
+            parts = name.split("_")
+            return "".join(part.capitalize() for part in parts if part)
+        return name[0].upper() + name[1:]
 
     def _rule_to_name(self, rule: str) -> str:
         parts = rule.split("_")

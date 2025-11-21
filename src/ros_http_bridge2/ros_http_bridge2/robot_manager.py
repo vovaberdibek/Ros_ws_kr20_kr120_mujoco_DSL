@@ -20,6 +20,7 @@ BUILDING_BLOCKS = {
     "loadTray",
     "mrHoming",
     "mrTrolleyVCheck",
+    "mrTrolleyVCheckErrorCheck",
     "pickUpTray",
     "positionerRotate",
     "present2Op",
@@ -423,7 +424,7 @@ class PLCClient:
 class RobotManager:
     UNIT_INDEX_ACTIONS = {"PositionTray", "RechargeSequence", "InternalScrewingSequence"}
     ACTION_PARAM_SCHEMAS = {
-        "AddTray": {"required": {"tray": str, "object": str}},
+        "AddTray": {"required": {"tray": str}},
         "InternalScrewUnitHole": {"required": {"unit": str, "hole": int}},
         "CallBlock": {"required": {"name": str}},
     }
@@ -524,6 +525,8 @@ class RobotManager:
             self.plc_client = PLCClient(logger=self._plc_log)
 
     def to_camel_case(self, snake_str):
+        if '_' not in snake_str:
+            return snake_str
         components = snake_str.split('_')
         return ''.join(x.capitalize() for x in components)
 
@@ -541,10 +544,20 @@ class RobotManager:
 
 
 
-    def _get_named_param(self, named_params: Dict[str, Any], key: str, action: str):
+    def _get_named_param(
+        self,
+        named_params: Dict[str, Any],
+        key: str,
+        action: str,
+        *,
+        required: bool = True,
+        default: Any = None,
+    ):
         if key not in named_params:
-            print(f"❌ Action '{action}' missing required parameter '{key}'.")
-            return None
+            if required:
+                print(f"❌ Action '{action}' missing required parameter '{key}'.")
+                return None
+            return default
         return named_params[key]
 
     def _extract_index_param(self, action: str, named_params: Dict[str, Any], positional_params: List[Any]):
@@ -615,23 +628,49 @@ class RobotManager:
     def _plc_log(self, message: str):
         print(f"[PLC] {message}")
 
+    def _print_operator_guidance(self):
+        trays = getattr(self, "trays", {}) or {}
+        if not trays:
+            print("ℹ️ Operator guidance unavailable (no tray metadata).")
+            return
+        print("👷 Operator manual screw guide:")
+        for tray_name, tray in trays.items():
+            units = tray.get("units") or []
+            for unit in units:
+                unit_name = unit.get("name", "<unnamed>")
+                screws = unit.get("screws") or {}
+                manual = screws.get("manual_indices") or []
+                auto = screws.get("auto_indices") or []
+                pose_idx = unit.get("pose_index")
+                if not manual and not auto:
+                    continue
+                parts = []
+                if manual:
+                    parts.append(f"manual {sorted(int(v) for v in manual)}")
+                if auto:
+                    parts.append(f"auto {sorted(int(v) for v in auto)}")
+                pose_str = f"pose_index={pose_idx}" if pose_idx is not None else "pose_index=?"
+                print(f"   • Tray '{tray_name}' unit '{unit_name}' ({pose_str}) → {', '.join(parts)}")
+
     def _execute_real_task(self, action: str, named_params: Dict[str, Any], positional_params: List[Any]):
         if not self.plc_client:
             print("❌ PLC client is not initialized; cannot execute real-mode workflow.")
-            return
-
-        if action != "CallBlock":
-            print(f"⚠️ Skipping '{action}' in real mode. Only CallBlock actions are executed.")
             return
 
         payload = dict(named_params)
         if not payload and positional_params:
             payload = self._list_to_named_params(positional_params)
 
-        block_name = payload.pop("name", None)
-        if block_name is None:
-            print("❌ CallBlock requires a 'name' parameter.")
-            return
+        if action == "CallBlock":
+            block_name = payload.pop("name", None)
+            if block_name is None:
+                print("❌ CallBlock requires a 'name' parameter.")
+                return
+        else:
+            block_name = action
+
+        payload.pop("location", None)
+        payload.pop("target_location", None)
 
         resolved = resolve_block_name(str(block_name))
         if not resolved:
@@ -777,6 +816,11 @@ class RobotManager:
     def execute_task(self, task, module_name="my_python_pkg.functions"):
         action = task["action"]
         params = task.get("params")
+        robot_name = task.get("robot")
+        from_location = task.get("from")
+        to_location = task.get("to")
+        control_type = task.get("control_type", "automated")
+        task["control_type"] = control_type
         if isinstance(params, dict):
             named_params = params
             positional_params: List[Any] = []
@@ -793,10 +837,18 @@ class RobotManager:
                 return
             named_params = injected
 
+        if robot_name and isinstance(named_params, dict):
+            if from_location and "location" not in named_params:
+                named_params["location"] = from_location
+            elif to_location and "location" not in named_params:
+                named_params["location"] = to_location
+            if to_location and "target_location" not in named_params:
+                named_params["target_location"] = to_location
+
         # … code that replaces tray names with objects, digits → ints, etc. …
 
         # 1) Manual confirmation? (unchanged)
-        if task["control_type"] == "manual" and self.mode == "simulation":
+        if control_type == "manual" and self.mode == "simulation":
             task_desc = f"Execute '{action}' with parameters {params}?"
             confirmed = self.http_client.confirm_workflow(task_desc)
             if not confirmed:
@@ -815,8 +867,16 @@ class RobotManager:
         response_data = {}
         if action == "AddTray":
             tray_name = self._get_named_param(named_params, "tray", action)
-            object_name = self._get_named_param(named_params, "object", action)
-            if tray_name is None or object_name is None:
+            if tray_name is None:
+                return
+            object_name = self._get_named_param(
+                named_params,
+                "object",
+                action,
+                required=False,
+                default=tray_name,
+            )
+            if object_name is None:
                 return
             tray_name = str(tray_name).strip('"')
             object_name = str(object_name).strip('"')
@@ -829,6 +889,8 @@ class RobotManager:
             idx = self._extract_index_param(action, named_params, positional_params)
             if idx is None:
                 return
+            if action == "OperatorPositionTray":
+                self._print_operator_guidance()
             snake_endpoint = re.sub(r'(?<!^)(?=[A-Z])', '_', action).lower()
             print(f"📡 [HTTP] {action}: index={idx} → /{snake_endpoint}")
             response_data = self.http_client.index_action(snake_endpoint, idx)

@@ -89,8 +89,22 @@ operator_pose: "operator_pose" ":" vector6
 final_pose: "final_pose" ":" vector6
 
 
-assembly_definition: "Assembly" ":" assembly_command+
-assembly_command: CONTROL_TYPE (add_tray | pick_tray | operator_position_tray | recharge_sequence | internal_screw_unit_hole | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble | call_block) [repeat] [speed]
+assembly_definition: "Assembly" ":" assembly_command+ (";" assembly_command+)* [";"]
+assembly_command: control_clause? (legacy_action | robot_command) [repeat] [speed]
+control_clause: CONTROL_TYPE
+
+legacy_action: add_tray | pick_tray | operator_position_tray | recharge_sequence | internal_screw_unit_hole | internal_screwing_sequence | external_screwing_sequence | place_tray | load_tray | bring_tray | position_tray | initial_assemble | finish_assemble | call_block
+
+robot_command: IDENTIFIER action_spec ":" robot_command_list
+action_spec: IDENTIFIER
+robot_command_list: robot_command_item+
+robot_command_item: robot_param | robot_positional_param | from_clause | to_clause | confirm_clause
+robot_param: IDENTIFIER robot_param_value
+robot_param_value: "=" value_atom | value_atom
+robot_positional_param: value_atom
+from_clause: "from" IDENTIFIER
+to_clause: "to" IDENTIFIER
+confirm_clause: "ToConfirm"
 
 add_tray: "AddTray" named_arg named_arg
 operator_position_tray: "OperatorPositionTray" named_arg
@@ -140,7 +154,7 @@ float_list: "[" [NUMBER ("," NUMBER)*] [","] "]"
 NUMBER: SIGNED_NUMBER
 
 CONTROL_TYPE: "manual" | "automated" | "supervised"
-IDENTIFIER: /(?!manual(?![a-zA-Z0-9_])|automated(?![a-zA-Z0-9_])|supervised(?![a-zA-Z0-9_]))[a-zA-Z_][a-zA-Z0-9_]*/
+IDENTIFIER: /(?!manual(?![a-zA-Z0-9_])|automated(?![a-zA-Z0-9_])|supervised(?![a-zA-Z0-9_])|from(?![a-zA-Z0-9_])|to(?![a-zA-Z0-9_])|ToConfirm(?![a-zA-Z0-9_]))[a-zA-Z_][a-zA-Z0-9_]*/
 STRING: /"[^"]*"/
 COLON: ":"
 COMMA: ","
