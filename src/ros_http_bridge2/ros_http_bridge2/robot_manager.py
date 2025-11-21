@@ -66,78 +66,15 @@ class RobotHTTPClient:
             print(f"❌ confirm_workflow HTTP call failed: {e}")
             return False
 
-    def add_tray2(self, tray_name: str, object_name: str):
-        url = f"{self.base_url}/add_tray2"
-        payload = {"tray_name": tray_name, "object_name": object_name}
-        try:
-            res = requests.post(url, json=payload, timeout=30.0)
-            return res.json()
-        except requests.RequestException as e:
-            print(f"❌ AddTray2 HTTP call failed: {e}")
-            return {}
-
-    def index_action(self, endpoint: str, index: int):
-        """
-        For all endpoints that expect {'index': <int>},
-        like /pick_tray, /position_tray, etc.
-        """
-        url = f"{self.base_url}/{endpoint}"
-        payload = {"index": index}
-        try:
-            res = requests.post(url, json=payload, timeout=30.0)
-            return res.json()
-        except requests.RequestException as e:
-            print(f"❌ {endpoint} HTTP call failed: {e}")
-            return {}
-
-    def generic_params_action(self, action: str, params_list):
-        """
-        For any endpoint that expects {"params": [...]}, e.g. some custom endpoints.
-        We still include the CamelCase → snake_case transform.
-        """
-        snake = re.sub(r'(?<!^)(?=[A-Z])', '_', action).lower()
-        url = f"{self.base_url}/{snake}"
-        try:
-            res = requests.post(url, json={"params": params_list}, timeout=30.0)
-            return res.json()
-        except requests.RequestException as e:
-            print(f"❌ HTTP call to {url} failed: {e}")
-            return {}
-
-    def internal_screw_by_num(self, index: int, screw_num: int):
-        url = f"{self.base_url}/internal_screw_by_num"
-        payload = {"index": int(index), "ScrewNum": int(screw_num)}
+    def execute_action(self, action: str, params: Dict[str, Any]):
+        url = f"{self.base_url}/execute_action"
+        payload = {"action": action, "params": params}
         try:
             res = requests.post(url, json=payload, timeout=60.0)
             return res.json()
         except requests.RequestException as e:
-            print(f"❌ internal_screw_by_num HTTP call failed: {e}")
+            print(f"❌ execute_action '{action}' HTTP call failed: {e}")
             return {}
-
-
-    # def execute_action(self, action, data):
-    #     try:
-    #         response = requests.post(
-    #             f"{self.base_url}/{action.lower()}",
-    #             json=data,
-    #             timeout=5.0
-    #         )
-    #         return response.json()
-    #     except requests.RequestException as e:
-    #         print(f"❌ {action} HTTP call failed: {e}")
-    #         return {}
-        
-    def execute_action(self, action, data):
-        """
-        Convert CamelCase (e.g. "PositionTray") → snake_case (e.g. "position_tray"),
-        then do POST /<that> with JSON payload.
-        """
-        # 1) insert underscore before each capital letter (except the very first),
-        #    then lowercase everything.
-        snake = re.sub(r'(?<!^)(?=[A-Z])', '_', action).lower()
-        url = f"{self.base_url}/{snake}"
-        response = requests.post(url, json=data, timeout=30.0)
-        return response.json()
 
 
 class PLCClient:
@@ -464,6 +401,10 @@ class RobotManager:
         self.trays = artifacts.trays
         self.locations = artifacts.locations
         self.tray_step_poses = artifacts.tray_step_poses
+        self.tray_step_pose_names = getattr(artifacts, "tray_step_pose_names", [None] * len(self.tray_step_poses))
+        self.tray_step_pose_name_to_index = {
+            name: idx for idx, name in enumerate(self.tray_step_pose_names) if name is not None
+        }
         self.main_poses = artifacts.main_poses
         self.named_poses = artifacts.named_poses
         self.parameters = artifacts.parameters
@@ -471,8 +412,20 @@ class RobotManager:
         self.location_name_to_index = artifacts.location_name_to_index
 
         # Construct the same "params" dictionary you used in ROS version
+        tray_pose_operator = (
+            self.parameters.get('tray_pose_operator')
+            or self.parameters.get('TrayPoseOperator')
+            or self.named_poses.get('TrayPoseOperator', [])
+        )
+        tray_final_pose = (
+            self.parameters.get('tray_final_pose')
+            or self.parameters.get('TrayFinalPose')
+            or self.named_poses.get('TrayFinalPose', [])
+        )
+
         params = {
             'tray_step_poses':     self.tray_step_poses,
+            'tray_step_pose_names': self.tray_step_pose_names,
             'named_poses':         self.named_poses,
             'main_poses':          self.main_poses,
             'trays':               self.trays,
@@ -488,8 +441,8 @@ class RobotManager:
             'origin_to_bottom':    self.parameters.get('origin_to_bottom', []),
             'new_dummy':           self.parameters.get('new_dummy', ''),
             'tray_init_offset':    self.parameters.get('tray_init_offset', []),
-            'tray_pose_operator':  self.parameters.get('tray_pose_operator', []),
-            'tray_final_pose':     self.parameters.get('tray_final_pose', []),
+            'tray_pose_operator':  tray_pose_operator,
+            'tray_final_pose':     tray_final_pose,
         }
 
         if self.mode == "simulation":
@@ -581,7 +534,11 @@ class RobotManager:
             return
         if 0 <= idx < len(self.tray_step_poses):
             pose = self.tray_step_poses[idx]
-            print(f"🧭 {context}: tray_step_pose[{idx}] = {pose}")
+            name = None
+            if 0 <= idx < len(self.tray_step_pose_names):
+                name = self.tray_step_pose_names[idx]
+            label = name or f"index {idx}"
+            print(f"🧭 {context}: tray_step_pose '{label}' = {pose}")
         else:
             print(f"⚠️ {context}: tray_step_pose index {idx} out of range (len={len(self.tray_step_poses)}).")
 
@@ -628,7 +585,7 @@ class RobotManager:
     def _plc_log(self, message: str):
         print(f"[PLC] {message}")
 
-    def _print_operator_guidance(self):
+    def _print_operator_guidance(self, target_location: Optional[str] = None):
         trays = getattr(self, "trays", {}) or {}
         if not trays:
             print("ℹ️ Operator guidance unavailable (no tray metadata).")
@@ -642,6 +599,7 @@ class RobotManager:
                 manual = screws.get("manual_indices") or []
                 auto = screws.get("auto_indices") or []
                 pose_idx = unit.get("pose_index")
+                pose_name = unit.get("pose_name") or self.unit_lookup.get(unit_name, {}).get("pose_name")
                 if not manual and not auto:
                     continue
                 parts = []
@@ -649,8 +607,23 @@ class RobotManager:
                     parts.append(f"manual {sorted(int(v) for v in manual)}")
                 if auto:
                     parts.append(f"auto {sorted(int(v) for v in auto)}")
-                pose_str = f"pose_index={pose_idx}" if pose_idx is not None else "pose_index=?"
+                if pose_name:
+                    pose_str = f"pose='{pose_name}'"
+                elif pose_idx is not None:
+                    pose_str = f"pose_index={pose_idx}"
+                else:
+                    pose_str = "pose_index=?"
                 print(f"   • Tray '{tray_name}' unit '{unit_name}' ({pose_str}) → {', '.join(parts)}")
+        if target_location:
+            loc = self.locations.get(target_location)
+            if loc:
+                pos = loc.get("position", [])
+                orient = loc.get("orientation", [])
+                print(
+                    f"📍 Target location '{target_location}': position={pos}, orientation={orient}"
+                )
+            else:
+                print(f"📍 Target location '{target_location}' is not defined in Locations.")
 
     def _execute_real_task(self, action: str, named_params: Dict[str, Any], positional_params: List[Any]):
         if not self.plc_client:
@@ -722,8 +695,19 @@ class RobotManager:
                     )
                     continue
 
-                if unit.pose_index is None:
-                    errors.append(f"Unit '{unit.name}' in tray '{name}' is missing 'pose_index'.")
+                pose_index = unit.pose_index
+                pose_name = getattr(unit, "pose_name", None)
+                if pose_index is None and pose_name:
+                    pose_index = self.tray_step_pose_name_to_index.get(pose_name)
+                    if pose_index is None:
+                        errors.append(
+                            f"Unit '{unit.name}' in tray '{name}' references unknown pose '{pose_name}'."
+                        )
+                        continue
+                if pose_index is None:
+                    errors.append(
+                        f"Unit '{unit.name}' in tray '{name}' must define either 'pose_name' or 'pose_index'."
+                    )
                     continue
 
                 screw_meta = unit.screws
@@ -736,7 +720,8 @@ class RobotManager:
 
                 self.unit_lookup[unit.name] = {
                     "tray": name,
-                    "pose_index": int(unit.pose_index),
+                    "pose_index": int(pose_index),
+                    "pose_name": pose_name,
                     "allowed_screws": allowed,
                     "definition": unit.dict(),
                 }
@@ -859,12 +844,10 @@ class RobotManager:
             self._execute_real_task(action, named_params, positional_params)
             return
 
-        # 2) Now choose the correct HTTP call:
-        #    - AddTray uses named parameters (tray/object)
-        #    - Single-index actions
-        #    - Everything else fall back to a {"params": […]} body
-
         response_data = {}
+        http_action = action
+        http_payload: Optional[Dict[str, Any]] = None
+
         if action == "AddTray":
             tray_name = self._get_named_param(named_params, "tray", action)
             if tray_name is None:
@@ -880,8 +863,8 @@ class RobotManager:
                 return
             tray_name = str(tray_name).strip('"')
             object_name = str(object_name).strip('"')
-            print(f"📡 [HTTP] AddTray: tray='{tray_name}', object='{object_name}'")
-            response_data = self.http_client.add_tray2(tray_name, object_name)
+            print(f"📡 [HTTP] {action}: tray='{tray_name}', object='{object_name}'")
+            http_payload = {"tray": tray_name, "object": object_name}
 
         elif action in ["PickTray", "PositionTray", "OperatorPositionTray",
                         "RechargeSequence", "InternalScrewingSequence",
@@ -890,20 +873,26 @@ class RobotManager:
             if idx is None:
                 return
             if action == "OperatorPositionTray":
-                self._print_operator_guidance()
-            snake_endpoint = re.sub(r'(?<!^)(?=[A-Z])', '_', action).lower()
-            print(f"📡 [HTTP] {action}: index={idx} → /{snake_endpoint}")
-            response_data = self.http_client.index_action(snake_endpoint, idx)
+                target_hint = (
+                    named_params.get("target_location")
+                    or named_params.get("location")
+                    or to_location
+                )
+                self._print_operator_guidance(target_hint)
+            target_desc = (
+                named_params.get("location")
+                or named_params.get("target_location")
+                or named_params.get("unit")
+                or named_params.get("tray")
+                or (f"index {idx}")
+            )
+            print(f"📡 [HTTP] {action}: target='{target_desc}'")
             location_hint = named_params.get("location")
             if location_hint:
-                print(f"   ↳ Resolved location '{location_hint}' → index {idx}")
-            self._log_tray_pose(idx, action)
-            if action == "PositionTray" and response_data.get("success", True):
-                self.current_tray_step = idx
-            elif action == "InternalScrewingSequence" and response_data.get("success", True):
-                self.current_tray_step = idx
-            elif action == "PlaceTray" and response_data.get("success", True):
-                self.current_tray_step = None
+                print(f"   ↳ Resolved location '{location_hint}' → '{target_desc}'")
+            if action in {"PositionTray", "InternalScrewingSequence"}:
+                self._log_tray_pose(idx, action)
+            http_payload = {"index": int(idx)}
 
         elif action == "InternalScrewUnitHole":
             unit_name = self._get_named_param(named_params, "unit", action)
@@ -932,7 +921,9 @@ class RobotManager:
                             print(
                                 f"↪️ Auto PositionTray: aligning tray step {tray_index} for unit '{unit_name}'."
                             )
-                            auto_resp = self.http_client.index_action("position_tray", tray_index)
+                            auto_resp = self.http_client.execute_action(
+                                "PositionTray", {"index": int(tray_index)}
+                            )
                             print(f"Response for auto PositionTray: {auto_resp}")
                             if not auto_resp.get("success", True):
                                 response_data = {
@@ -945,21 +936,26 @@ class RobotManager:
                         if not response_data or response_data.get("success", True):
                             self._log_tray_pose(tray_index, f"InternalScrew({unit_name})")
                             print(f"🧷 InternalScrew unit '{unit_name}' → tray_index {tray_index}, hole {hole}")
-                            print(
-                                f"📡 [HTTP] InternalScrew unit={unit_name} hole={hole} (tray step {tray_index})"
-                            )
-                            response_data = self.http_client.internal_screw_by_num(tray_index, hole)
+                            print(f"📡 [HTTP] InternalScrew unit={unit_name} hole={hole}")
+                            http_action = "InternalScrew"
+                            http_payload = {"index": int(tray_index), "screw_num": int(hole)}
 
-        else:
-            # Fallback: send everything under {"params": […]}
-            # e.g. if there is any other action that expects a "params" list
-            fallback_params = []
-            if isinstance(params, list):
-                fallback_params = params
-            elif isinstance(params, dict) and params:
-                fallback_params = [params]
-            print(f"📡 [HTTP] Fallback for '{action}', data={{'params': {fallback_params}}}")
-            response_data = self.http_client.generic_params_action(action, fallback_params)
+        if http_payload is None:
+            print(f"❌ Action '{action}' is not supported by the simulation HTTP bridge.")
+            return
+
+        result_index = None
+        if isinstance(http_payload, dict) and "index" in http_payload:
+            result_index = http_payload["index"]
+
+        response_data = self.http_client.execute_action(http_action, http_payload)
+
+        if action == "PositionTray" and result_index is not None and response_data.get("success", True):
+            self.current_tray_step = int(result_index)
+        elif action == "InternalScrewingSequence" and result_index is not None and response_data.get("success", True):
+            self.current_tray_step = int(result_index)
+        elif action == "PlaceTray" and response_data.get("success", True):
+            self.current_tray_step = None
 
         print(f"Response for '{action}': {response_data}")
 

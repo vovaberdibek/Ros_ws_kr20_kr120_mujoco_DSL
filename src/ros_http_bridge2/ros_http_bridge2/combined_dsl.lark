@@ -1,5 +1,5 @@
 
-start: mode_definition agents_definition? locations_definition? trays_definition? parameters_definition? tray_step_poses_definition? main_poses_definition? assembly_definition
+start: mode_definition agents_definition? locations_definition? trays_definition? parameters_definition? poses_definition? tray_step_poses_definition? assembly_definition
 
 mode_definition: "Mode" ":" MODE_VALUE
 MODE_VALUE: "simulation" | "real"
@@ -12,44 +12,28 @@ parameter: tip_offset
          | tray_angles
          | tray_down_steps
          | rotation_steps
-         | tray_final_pose
-         | tray_pose_operator
-         | rest_pose
-         | pre_pick_pose
-         | post_pick_pose
-         | pre_recharge_pose
-         | pre_end_pose
          | tray_heights
          | origin_to_bottom
          | tray_init_offset
-         | named_pose_entry
 
 
 tip_offset: "TipOffset" ":" vector3
 tray_angles: "TrayAngles" ":" vector2
 tray_down_steps: "TrayDownSteps" ":" int_list
 rotation_steps: "RotationSteps" ":" int_list
-named_pose_entry: IDENTIFIER ":" vector6
-tray_final_pose: "TrayFinalPose" ":" vector6
-tray_pose_operator: "TrayPoseOperator" ":" vector6
-rest_pose: "RestPose" ":" vector6
-pre_pick_pose: "PrePickPose" ":" vector6
-post_pick_pose: "PostPickPose" ":" vector6
-pre_recharge_pose: "PreRechargePose" ":" vector6
-pre_end_pose: "PreEndPose" ":" vector6
 tray_heights: "TrayHeights" ":" float_list
 origin_to_bottom: "OriginToBottomDistances" ":" float_list
 tray_init_offset: "TrayInitOffset" ":" vector2
 
 
 tray_step_poses_definition: "TrayStepPoses" ":" "[" tray_pose_entry ("," tray_pose_entry)* "]"
-tray_pose_entry: vector6
+tray_pose_entry: vector6 | IDENTIFIER
 
 locations_definition: "Locations" ":" location+
 location: IDENTIFIER ":" "{" "position" ":" vector3 "," "orientation" ":" vector3 "}"
 
-main_poses_definition: "MainPoses" ":" main_pose+
-main_pose: IDENTIFIER ":" vector6
+poses_definition: "Poses" ":" pose_entry+
+pose_entry: IDENTIFIER ":" vector6
 
 trays_definition: "Trays" ":" tray+
 tray: IDENTIFIER ":" "{" tray_attribute* "}"

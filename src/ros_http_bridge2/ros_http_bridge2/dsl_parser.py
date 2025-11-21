@@ -13,7 +13,7 @@ ACTION_PARAM_ORDER = {
     "OperatorPositionTray": ["location"],
     "PositionTray": ["unit"],
     "RechargeSequence": ["unit"],
-    "InternalScrewingSequence": ["index"],
+    "InternalScrewingSequence": ["unit"],
     "InternalScrew": ["unit", "hole"],
     "PlaceTray": [],
     "ScrewPickup": ["screw"],
@@ -42,6 +42,7 @@ class WorkflowArtifacts:
     trays: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     locations: Dict[str, Dict[str, List[float]]] = field(default_factory=dict)
     tray_step_poses: List[List[float]] = field(default_factory=list)
+    tray_step_pose_names: List[Optional[str]] = field(default_factory=list)
     main_poses: Dict[str, List[float]] = field(default_factory=dict)
     named_poses: Dict[str, List[float]] = field(default_factory=dict)
     parameters: Dict[str, Any] = field(default_factory=dict)
@@ -62,11 +63,14 @@ class DSLParser:
         self.trays: Dict[str, Dict[str, Any]] = {}
         self.locations: Dict[str, Dict[str, List[float]]] = {}
         self.tray_step_poses: List[List[float]] = []
+        self.tray_step_pose_names: List[Optional[str]] = []
+        self.tray_step_pose_names: List[Optional[str]] = []
         self.main_poses: Dict[str, List[float]] = {}
         self.named_poses: Dict[str, List[float]] = {}
         self.parameters: Dict[str, Any] = {}
         self.location_order: List[str] = []
         self.location_name_to_index: Dict[str, int] = {}
+        self._tray_step_entries: List[tuple[str, Any]] = []
 
         for child in tree.children:
             if not isinstance(child, Tree):
@@ -75,6 +79,8 @@ class DSLParser:
             if handler:
                 handler(child)
 
+        self._finalize_tray_step_poses()
+
         return WorkflowArtifacts(
             mode=self.mode,
             agents=self.agents,
@@ -82,6 +88,7 @@ class DSLParser:
             trays=self.trays,
             locations=self.locations,
             tray_step_poses=self.tray_step_poses,
+            tray_step_pose_names=self.tray_step_pose_names,
             main_poses=self.main_poses,
             named_poses=self.named_poses,
             parameters=self.parameters,
@@ -109,6 +116,9 @@ class DSLParser:
             position = [float(tok.value) for tok in loc.children[1].children]
             orientation = [float(tok.value) for tok in loc.children[2].children]
             self.locations[name] = {"position": position, "orientation": orientation}
+            pose_vec = list(position) + list(orientation)
+            self.named_poses[name] = pose_vec
+            self.main_poses[name] = pose_vec
             if name not in self.location_name_to_index:
                 idx = len(self.location_order)
                 self.location_order.append(name)
@@ -158,22 +168,17 @@ class DSLParser:
             self.trays[name] = payload
 
     def _handle_tray_step_poses_definition(self, node: Tree):
-        poses: List[List[float]] = []
         for entry in node.children:
-            vec = entry
-            if isinstance(entry, Tree) and entry.data == "tray_pose_entry" and entry.children:
-                vec = entry.children[0]
-            if isinstance(vec, Tree) and vec.data == "vector6":
-                poses.append([float(tok.value) for tok in vec.children])
-        self.tray_step_poses = poses
+            self._tray_step_entries.append(self._parse_tray_step_entry(entry))
 
-    def _handle_main_poses_definition(self, node: Tree):
+    def _handle_poses_definition(self, node: Tree):
         for pose in node.children:
             if not isinstance(pose, Tree):
                 continue
             name = pose.children[0].value
             values = [float(tok.value) for tok in pose.children[1].children]
             self.main_poses[name] = values
+            self.named_poses[name] = values
 
     def _handle_parameters_definition(self, node: Tree):
         for parameter in node.children:
@@ -183,24 +188,12 @@ class DSLParser:
             if not isinstance(inner, Tree):
                 continue
             rule = str(inner.data)
-            if rule == "named_pose_entry":
-                name_token, vec = inner.children
-                values = [float(tok.value) for tok in vec.children]
-                camel = name_token.value
-                snake = self._to_snake_case(camel)
-                self.named_poses[camel] = values
-                self.parameters[camel] = values
-                self.parameters[snake] = values
-                continue
             value_tree = inner.children[0] if inner.children else None
             if not isinstance(value_tree, Tree):
                 continue
             camel = self._rule_to_name(rule)
             snake = rule
-            if value_tree.data == "vector6":
-                values = [float(tok.value) for tok in value_tree.children]
-                self.named_poses[camel] = values
-            elif value_tree.data == "vector3":
+            if value_tree.data == "vector3":
                 values = [float(tok.value) for tok in value_tree.children]
             elif value_tree.data == "vector2":
                 values = [float(tok.value) for tok in value_tree.children]
@@ -413,6 +406,34 @@ class DSLParser:
             value = self._literal_from_node(child.children[1])
             params[key] = value
         return params
+
+    def _parse_tray_step_entry(self, entry: Any):
+        if isinstance(entry, Token):
+            return ("name", entry.value)
+        if isinstance(entry, Tree):
+            if entry.data == "tray_pose_entry" and entry.children:
+                return self._parse_tray_step_entry(entry.children[0])
+            if entry.data == "vector6":
+                return ("vector", [float(tok.value) for tok in entry.children])
+        raise DSLValidationError(["TrayStepPoses entries must be pose names or [x,y,z,rx,ry,rz] vectors."])
+
+    def _finalize_tray_step_poses(self):
+        resolved: List[List[float]] = []
+        names: List[Optional[str]] = []
+        for kind, payload in getattr(self, "_tray_step_entries", []):
+            if kind == "vector":
+                resolved.append(payload)
+                names.append(None)
+            else:
+                pose = self.named_poses.get(payload)
+                if pose is None:
+                    raise DSLValidationError([
+                        f"TrayStepPose '{payload}' is not defined in Poses or Parameters."
+                    ])
+                resolved.append(pose)
+                names.append(payload)
+        self.tray_step_poses = resolved
+        self.tray_step_pose_names = names
 
     def _to_camel_case(self, name: str) -> str:
         if not name:

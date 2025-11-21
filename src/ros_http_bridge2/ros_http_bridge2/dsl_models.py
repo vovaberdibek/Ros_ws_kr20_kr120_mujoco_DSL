@@ -23,6 +23,7 @@ class UnitScrewSpec(BaseModel):
 class UnitModel(BaseModel):
     name: str
     pose_index: Optional[int] = None
+    pose_name: Optional[str] = None
     screws: Optional[UnitScrewSpec] = None
 
     class Config:
@@ -70,7 +71,7 @@ class IndexModel(BaseModel):
     index: int
 
 
-class AddTray2Model(BaseModel):
+class AddTrayModel(BaseModel):
     tray_name: str
     object_name: str
 
@@ -91,3 +92,8 @@ class RunModel(BaseModel):
 class InternalScrewByNumModel(BaseModel):
     index: int
     ScrewNum: int
+
+
+class ExecuteActionModel(BaseModel):
+    action: str
+    params: Dict[str, Any] = Field(default_factory=dict)

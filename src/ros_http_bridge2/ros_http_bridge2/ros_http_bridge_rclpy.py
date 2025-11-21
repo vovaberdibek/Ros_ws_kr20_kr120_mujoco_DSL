@@ -11,6 +11,7 @@ from typing import Dict, List, Any, Optional
 import rclpy
 from rclpy.node import Node
 from rclpy.task import Future
+from rclpy.action import ActionClient
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,20 +23,9 @@ from lark.exceptions import UnexpectedInput
 import importlib.resources as pkg_res
 
 # -------------- Import ROS 2 service types --------------
-from custom_interfaces.srv import (
-    BringTray                      as BringTraySrv,
-    PositionTray                   as PositionTraySrv,
-    PickTray                       as PickTraySrv,
-    AddTray                        as AddTraySrv,
-    AddTray2                       as AddTray2Srv,
-    InitParameters                 as InitParametersSrv,
-    InternalScrewingSequence       as InternalScrewingSrv,
-    InternalScrewByNum             as InternalScrewSrv,
-    ExternalScrewingSequence       as ExternalScrewingSrv,
-    PlaceTray                      as PlaceTraySrv,
-    OperatorPositionTray           as OperatorPositionTraySrv,
-    RechargeSequence               as RechargeSequenceSrv,
-)
+from custom_interfaces.srv import InitParameters as InitParametersSrv
+from custom_interfaces.action import ExecuteAction
+from diagnostic_msgs.msg import KeyValue
 
 # ---------- FastAPI app ----------
 app = FastAPI()
@@ -51,11 +41,12 @@ from .dsl_models import (
     InitParamsModel,
     BringTrayModel,
     IndexModel,
-    AddTray2Model,
+    AddTrayModel,
     ConfirmModel,
     ConfirmResponseModel,
     RunModel,
     InternalScrewByNumModel,
+    ExecuteActionModel,
 )
 
 # ---- Confirmation state (shared with RobotManager monkey-patch) ----
@@ -67,6 +58,7 @@ class BridgeClient(Node):
     def __init__(self):
         super().__init__('ros_http_bridge')
         self._client_cache = {}  # (name, srv_type) -> client
+        self._execute_action_client = ActionClient(self, ExecuteAction, "execute_action")
 
     def _get_client(self, service_name: str, srv_type):
         key = (service_name, srv_type)
@@ -89,6 +81,46 @@ class BridgeClient(Node):
             raise RuntimeError(f"Service '{service_name}' returned None (exception likely).")
         return future.result()
 
+    def _encode_param_value(self, value: Any) -> str:
+        if isinstance(value, bool):
+            return "true" if value else "false"
+        if isinstance(value, (int, float)):
+            return str(value)
+        if value is None:
+            return ""
+        if isinstance(value, (dict, list)):
+            return json.dumps(value)
+        return str(value)
+
+    def call_execute_action(self, action_name: str, params: Dict[str, Any]):
+        if not self._execute_action_client.wait_for_server(timeout_sec=5.0):
+            raise RuntimeError("ExecuteAction server not available.")
+        goal = ExecuteAction.Goal()
+        goal.action_name = action_name
+        goal.params = []
+        for key, value in (params or {}).items():
+            kv = KeyValue()
+            kv.key = str(key)
+            kv.value = self._encode_param_value(value)
+            goal.params.append(kv)
+
+        send_future = self._execute_action_client.send_goal_async(goal)
+        rclpy.spin_until_future_complete(self, send_future)
+        goal_handle = send_future.result()
+        if goal_handle is None or not goal_handle.accepted:
+            return {"success": False, "message": f"Action '{action_name}' was rejected."}
+
+        result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self, result_future)
+        if not result_future.done():
+            return {"success": False, "message": f"Action '{action_name}' timed out."}
+        result = result_future.result().result
+        return {
+            "success": bool(result.success),
+            "message": result.message,
+            "result": result.result_json,
+        }
+
 # Make a single global node (initialized below)
 _bridge_node: Optional[BridgeClient] = None
 
@@ -101,6 +133,10 @@ def init_parameters(req: InitParamsModel):
     p = req.params
     ros_req = InitParametersSrv.Request()
     ros_req.tray_step_poses = [v for pose in p.get("tray_step_poses", []) for v in pose]
+    tray_step_pose_names = p.get("tray_step_pose_names", [])
+    pose_name_lookup = {}
+    if isinstance(tray_step_pose_names, list):
+        pose_name_lookup = {name: idx for idx, name in enumerate(tray_step_pose_names) if isinstance(name, str) and name}
 
     main_poses = p.get("main_poses", {})
     ros_req.table_pose       = main_poses.get("Table",       [0.0]*6)
@@ -135,8 +171,16 @@ def init_parameters(req: InitParamsModel):
     units, pose_indices = [], []
     for tray in p.get("trays", {}).values():
         for unit in tray.get("units", []):
-            units.append(unit["name"])
-            pose_indices.append(int(unit["pose_index"]))
+            unit_name = unit.get("name")
+            units.append(unit_name)
+            pose_idx = unit.get("pose_index")
+            if pose_idx is None:
+                pose_name = unit.get("pose_name")
+                if pose_name:
+                    pose_idx = pose_name_lookup.get(pose_name)
+            if pose_idx is None:
+                raise HTTPException(status_code=400, detail=f"Unit '{unit_name}' missing pose_index/pose_name mapping.")
+            pose_indices.append(int(pose_idx))
     ros_req.tray_unit_names        = units
     ros_req.tray_unit_pose_indices = pose_indices
 
@@ -154,92 +198,58 @@ def init_parameters(req: InitParamsModel):
     except RuntimeError as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# --------------- Single-index helpers ---------------
-def _index_call(service_name: str, srv_type, idx: int):
+
+@app.post("/execute_action")
+def execute_action(req: ExecuteActionModel):
+    return _dispatch_action(req.action, req.params)
+
+def _dispatch_action(action: str, params: Optional[Dict[str, Any]] = None):
     n = _bridge_node
     assert n is not None, "ROS2 node not initialized"
-    req = srv_type.Request()
-    # all your index-based srvs have 'index' field
-    if hasattr(req, 'index'):
-        req.index = int(idx)
-    else:
-        raise HTTPException(status_code=500, detail=f"Service '{service_name}' has no 'index' field")
-    resp = n.call_service(service_name, srv_type, req)
-    return {"success": bool(resp.success)} if hasattr(resp, 'success') else {"ok": True}
+    try:
+        return n.call_execute_action(action, params or {})
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/bring_tray")
 def bring_tray(req: BringTrayModel):
-    n = _bridge_node
-    assert n is not None, "ROS2 node not initialized"
-    ros_req = BringTraySrv.Request()
-    ros_req.tray_name = req.tray_name
-    ros_req.location  = req.location
-    try:
-        resp = n.call_service("bring_tray", BringTraySrv, ros_req)
-        return {"success": bool(resp.success)}
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return _dispatch_action("BringTray", {"tray": req.tray_name, "location": req.location})
 
 @app.post("/add_tray")
-def add_tray(req: IndexModel):
-    return _index_call("add_tray", AddTraySrv, req.index)
-
-@app.post("/add_tray2")
-def add_tray2(req: AddTray2Model):
-    n = _bridge_node
-    assert n is not None, "ROS2 node not initialized"
-    ros_req = AddTray2Srv.Request()
-    ros_req.tray_name   = req.tray_name
-    ros_req.object_name = req.object_name
-    try:
-        resp = n.call_service("add_tray2", AddTray2Srv, ros_req)
-        return {"success": bool(resp.success)}
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def add_tray2(req: AddTrayModel):
+    return _dispatch_action("AddTray", {"tray": req.tray_name, "object": req.object_name})
 
 @app.post("/pick_tray")
 def pick_tray(req: IndexModel):
-    return _index_call("pick_tray", PickTraySrv, req.index)
+    return _dispatch_action("PickTray", {"index": req.index})
 
 @app.post("/position_tray")
 def position_tray(req: IndexModel):
-    return _index_call("position_tray", PositionTraySrv, req.index)
+    return _dispatch_action("PositionTray", {"index": req.index})
 
 @app.post("/operator_position_tray")
 def operator_position_tray(req: IndexModel):
-    return _index_call("operator_position_tray", OperatorPositionTraySrv, req.index)
+    return _dispatch_action("OperatorPositionTray", {"index": req.index})
 
 @app.post("/recharge_sequence")
 def recharge_sequence(req: IndexModel):
-    return _index_call("recharge_sequence", RechargeSequenceSrv, req.index)
+    return _dispatch_action("RechargeSequence", {"index": req.index})
 
 @app.post("/internal_screwing_sequence")
 def internal_screwing_sequence(req: IndexModel):
-    return _index_call("internal_screwing_sequence", InternalScrewingSrv, req.index)
+    return _dispatch_action("InternalScrewingSequence", {"index": req.index})
 
 @app.post("/internal_screw_by_num")
 def internal_screw_by_num(req: InternalScrewByNumModel):
-    n = _bridge_node
-    assert n is not None, "ROS2 node not initialized"
-    ros_req = InternalScrewSrv.Request()
-    ros_req.index     = int(req.index)
-    ros_req.screw_num = int(req.ScrewNum) if hasattr(ros_req, 'screw_num') else int(req.ScrewNum)
-    try:
-        resp = n.call_service("internal_screw_by_num", InternalScrewSrv, ros_req)
-        out = {"success": bool(getattr(resp, 'success', True))}
-        if hasattr(resp, 'message'):
-            out["message"] = resp.message
-        return out
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return _dispatch_action("InternalScrew", {"index": req.index, "screw_num": req.ScrewNum})
 
 @app.post("/external_screwing_sequence")
 def external_screwing_sequence(req: IndexModel):
-    return _index_call("external_screwing_sequence", ExternalScrewingSrv, req.index)
+    return _dispatch_action("ExternalScrewingSequence", {"index": req.index})
 
 @app.post("/place_tray")
 def place_tray(req: IndexModel):
-    return _index_call("place_tray", PlaceTraySrv, req.index)
+    return _dispatch_action("PlaceTray", {"index": req.index})
 
 # --------------- Manual confirmation ---------------
 @app.post("/confirm_workflow")

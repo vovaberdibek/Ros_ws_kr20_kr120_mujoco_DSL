@@ -19,11 +19,13 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(diagnostic_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(geometry_msgs REQUIRED)  # Ensure geometry_msgs is here
 
 # Generate the service interfaces with dependencies
 rosidl_generate_interfaces(${PROJECT_NAME}
+  "action/ExecuteAction.action"
   "srv/InitParameters.srv"
   "srv/PlaceTray.srv" 
   "srv/ExternalScrewingSequence.srv"
@@ -38,7 +40,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ConfirmWorkflow.srv" 
   "srv/TriggerAction.srv"
   "srv/BringTray.srv"
-  DEPENDENCIES geometry_msgs  # Add DEPENDENCIES here
+  DEPENDENCIES geometry_msgs diagnostic_msgs  # Add DEPENDENCIES here
 )
 
 if(BUILD_TESTING)

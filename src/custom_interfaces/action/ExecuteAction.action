@@ -1,0 +1,10 @@
+string action_name
+# Optional parameters encoded as key-value string pairs
+# (values are ASCII string representations such as "true", "42", "OperatorStation")
+diagnostic_msgs/KeyValue[] params
+---
+bool success
+string message
+string result_json
+---
+string status

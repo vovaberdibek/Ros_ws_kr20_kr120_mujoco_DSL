@@ -8,8 +8,11 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <thread>
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <custom_interfaces/srv/init_parameters.hpp>
@@ -18,6 +21,8 @@
 #include <custom_interfaces/srv/position_tray.hpp>
 #include <custom_interfaces/srv/internal_screwing_sequence.hpp>
 #include <custom_interfaces/srv/internal_screw_by_num.hpp>
+#include <custom_interfaces/action/execute_action.hpp>
+#include <diagnostic_msgs/msg/key_value.hpp>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Vector3.h>
@@ -224,6 +229,8 @@ class CoordinatorNode : public rclcpp::Node {
   using PositionTray = custom_interfaces::srv::PositionTray;
   using InternalScrewingSequence = custom_interfaces::srv::InternalScrewingSequence;
   using InternalScrewByNum = custom_interfaces::srv::InternalScrewByNum;
+  using ExecuteAction = custom_interfaces::action::ExecuteAction;
+  using GoalHandleExecuteAction = rclcpp_action::ServerGoalHandle<ExecuteAction>;
 
 public:
   CoordinatorNode()
@@ -267,6 +274,16 @@ public:
     screw_single_srv_ = create_service<InternalScrewByNum>(
         "internal_screw_by_num",
         std::bind(&CoordinatorNode::handleInternalScrewByNum, this, _1, _2));
+
+    execute_action_server_ = rclcpp_action::create_server<ExecuteAction>(
+        get_node_base_interface(),
+        get_node_clock_interface(),
+        get_node_logging_interface(),
+        get_node_waitables_interface(),
+        "execute_action",
+        std::bind(&CoordinatorNode::handleExecuteActionGoal, this, _1, _2),
+        std::bind(&CoordinatorNode::handleExecuteActionCancel, this, _1),
+        std::bind(&CoordinatorNode::handleExecuteActionAccepted, this, _1));
 
     gripper_pub_ = create_publisher<trajectory_msgs::msg::JointTrajectory>(
         "/kr120_gripper_controller/joint_trajectory", rclcpp::QoS(10));
@@ -595,6 +612,168 @@ private:
     }
   }
 
+  rclcpp_action::GoalResponse handleExecuteActionGoal(
+      const rclcpp_action::GoalUUID &,
+      std::shared_ptr<const ExecuteAction::Goal> goal) {
+    RCLCPP_INFO(get_logger(), "Received ExecuteAction goal '%s'.", goal->action_name.c_str());
+    return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+  }
+
+  rclcpp_action::CancelResponse handleExecuteActionCancel(
+      const std::shared_ptr<GoalHandleExecuteAction> goal_handle) {
+    RCLCPP_WARN(get_logger(), "ExecuteAction goal cancelled for '%s'.",
+                goal_handle->get_goal()->action_name.c_str());
+    return rclcpp_action::CancelResponse::ACCEPT;
+  }
+
+  void handleExecuteActionAccepted(
+      const std::shared_ptr<GoalHandleExecuteAction> goal_handle) {
+    std::thread{std::bind(&CoordinatorNode::executeActionGoal, this, goal_handle)}.detach();
+  }
+
+  using ParamMap = std::unordered_map<std::string, std::string>;
+
+  ParamMap buildParamMap(const std::vector<diagnostic_msgs::msg::KeyValue> &params) const {
+    ParamMap result;
+    for (const auto &kv : params) {
+      result[kv.key] = kv.value;
+    }
+    return result;
+  }
+
+  bool parseIntParam(const ParamMap &map, const std::string &key, int &value) const {
+    auto iter = map.find(key);
+    if (iter == map.end()) {
+      return false;
+    }
+    try {
+      value = std::stoi(iter->second);
+      return true;
+    } catch (const std::exception &) {
+      return false;
+    }
+  }
+
+  void executeActionGoal(
+      const std::shared_ptr<GoalHandleExecuteAction> goal_handle) {
+    const auto goal = goal_handle->get_goal();
+    ParamMap params = buildParamMap(goal->params);
+
+    bool success = false;
+    std::string message;
+
+    const auto &action = goal->action_name;
+    auto result = std::make_shared<ExecuteAction::Result>();
+    auto feedback = std::make_shared<ExecuteAction::Feedback>();
+    feedback->status = "Executing " + action;
+    goal_handle->publish_feedback(feedback);
+
+    if (action == "PickTray") {
+      success = executePickTrayAction(params, message);
+    } else if (action == "PlaceTray") {
+      success = executePlaceTrayAction(params, message);
+    } else if (action == "PositionTray") {
+      success = executePositionTrayAction(params, message);
+    } else if (action == "InternalScrewingSequence") {
+      success = executeInternalSequenceAction(params, message);
+    } else if (action == "InternalScrew" || action == "InternalScrewUnitHole") {
+      success = executeInternalScrewAction(params, message);
+    } else if (action == "AddTray" || action == "BringTray") {
+      message = "Action handled externally; no robot motion required.";
+      success = true;
+    } else {
+      message = "Action '" + action + "' is not supported.";
+      success = false;
+    }
+
+    result->success = success;
+    result->message = message;
+    result->result_json = "{}";
+    if (success) {
+      goal_handle->succeed(result);
+    } else {
+      goal_handle->abort(result);
+    }
+  }
+
+  bool executePickTrayAction(const ParamMap &params, std::string &message) {
+    auto req = std::make_shared<PickTray::Request>();
+    auto resp = std::make_shared<PickTray::Response>();
+    if (auto it = params.find("index"); it != params.end()) {
+      try {
+        req->index = std::stoi(it->second);
+      } catch (...) {
+        // ignore invalid index for legacy compatibility
+      }
+    }
+    handlePickTray(req, resp);
+    message = resp->message.empty() ? "PickTray executed." : resp->message;
+    return resp->success;
+  }
+
+  bool executePlaceTrayAction(const ParamMap &params, std::string &message) {
+    auto req = std::make_shared<PlaceTray::Request>();
+    auto resp = std::make_shared<PlaceTray::Response>();
+    if (auto it = params.find("index"); it != params.end()) {
+      try {
+        req->index = std::stoi(it->second);
+      } catch (...) {
+      }
+    }
+    handlePlaceTray(req, resp);
+    message = resp->message.empty() ? "PlaceTray executed." : resp->message;
+    return resp->success;
+  }
+
+  bool executePositionTrayAction(const ParamMap &params, std::string &message) {
+    int index = 0;
+    if (!parseIntParam(params, "index", index)) {
+      message = "Parameter 'index' is required for PositionTray.";
+      return false;
+    }
+    auto req = std::make_shared<PositionTray::Request>();
+    auto resp = std::make_shared<PositionTray::Response>();
+    req->index = index;
+    handlePositionTray(req, resp);
+    message = resp->message;
+    return resp->success;
+  }
+
+  bool executeInternalSequenceAction(const ParamMap &params, std::string &message) {
+    int index = 0;
+    if (!parseIntParam(params, "index", index)) {
+      message = "Parameter 'index' is required for InternalScrewingSequence.";
+      return false;
+    }
+    auto req = std::make_shared<InternalScrewingSequence::Request>();
+    auto resp = std::make_shared<InternalScrewingSequence::Response>();
+    req->index = index;
+    handleInternalScrewing(req, resp);
+    message = resp->success ? "Internal screwing sequence completed." : "Internal screwing sequence failed.";
+    return resp->success;
+  }
+
+  bool executeInternalScrewAction(const ParamMap &params, std::string &message) {
+    int index = 0;
+    int screw = 0;
+    if (!parseIntParam(params, "index", index)) {
+      message = "Parameter 'index' is required for InternalScrew.";
+      return false;
+    }
+    if (!parseIntParam(params, "screw_num", screw) &&
+        !parseIntParam(params, "hole", screw)) {
+      message = "Parameter 'screw_num' (or 'hole') is required for InternalScrew.";
+      return false;
+    }
+    auto req = std::make_shared<InternalScrewByNum::Request>();
+    auto resp = std::make_shared<InternalScrewByNum::Response>();
+    req->index = index;
+    req->screw_num = screw;
+    handleInternalScrewByNum(req, resp);
+    message = resp->message.empty() ? "Internal screw completed." : resp->message;
+    return resp->success;
+  }
+
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr120_arm_group_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr20_arm_group_;
   std::shared_ptr<moveit::planning_interface::MoveGroupInterface> kr20_slide_group_;
@@ -607,6 +786,7 @@ private:
   rclcpp::Service<PositionTray>::SharedPtr position_srv_;
   rclcpp::Service<InternalScrewingSequence>::SharedPtr screw_srv_;
   rclcpp::Service<InternalScrewByNum>::SharedPtr screw_single_srv_;
+  rclcpp_action::Server<ExecuteAction>::SharedPtr execute_action_server_;
 
   rclcpp::TimerBase::SharedPtr init_timer_;
   bool move_groups_ready_{false};
