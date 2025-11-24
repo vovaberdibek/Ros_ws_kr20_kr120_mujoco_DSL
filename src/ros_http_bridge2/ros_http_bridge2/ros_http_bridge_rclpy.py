@@ -300,9 +300,13 @@ async def run_workflow(req: RunModel):
         detail = (
             f"DSL parse error at line {e.line}, column {e.column}: {e.get_context(req.dsl)}"
         )
+        # Log to server console for immediate visibility
+        print(f"❌ {detail}")
         raise HTTPException(status_code=400, detail=detail)
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"DSL parse error: {e}")
+        detail = f"DSL parse error: {e}"
+        print(f"❌ {detail}")
+        raise HTTPException(status_code=400, detail=detail)
 
     # Capture stdout/stderr
     buf = io.StringIO()

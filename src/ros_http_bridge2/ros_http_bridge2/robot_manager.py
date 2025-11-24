@@ -359,7 +359,7 @@ class PLCClient:
         )
 
 class RobotManager:
-    UNIT_INDEX_ACTIONS = {"PositionTray", "RechargeSequence", "InternalScrewingSequence"}
+    UNIT_INDEX_ACTIONS = {"PositionTray", "RechargeSequence", "InternalScrewingSequence", "OperatorPositionTray"}
     ACTION_PARAM_SCHEMAS = {
         "AddTray": {"required": {"tray": str}},
         "InternalScrewUnitHole": {"required": {"unit": str, "hole": int}},
@@ -514,6 +514,11 @@ class RobotManager:
         return named_params[key]
 
     def _extract_index_param(self, action: str, named_params: Dict[str, Any], positional_params: List[Any]):
+        # For operator positioning we only use the location/index, not the unit's tray-step.
+        if action != "OperatorPositionTray" and "unit" in named_params:
+            pose_index = self._resolve_unit_pose_index(str(named_params["unit"]), action)
+            if pose_index is not None:
+                return pose_index
         if "index" in named_params:
             return int(named_params["index"])
         if "location" in named_params:
@@ -522,6 +527,7 @@ class RobotManager:
             if idx is None:
                 print(f"❌ Action '{action}' references unknown location '{loc_name}'.")
                 return None
+            print(f"   ↳ Resolved location '{loc_name}' → index {idx}")
             return idx
         if positional_params:
             return int(positional_params[0])
@@ -585,16 +591,22 @@ class RobotManager:
     def _plc_log(self, message: str):
         print(f"[PLC] {message}")
 
-    def _print_operator_guidance(self, target_location: Optional[str] = None):
+    def _print_operator_guidance(self, target_location: Optional[str] = None, target_unit: Optional[str] = None):
         trays = getattr(self, "trays", {}) or {}
         if not trays:
             print("ℹ️ Operator guidance unavailable (no tray metadata).")
             return
+        if not target_unit:
+            print("ℹ️ OperatorPositionTray: add 'unit <name>' to show screw info for that unit.")
+            return
         print("👷 Operator manual screw guide:")
+        any_printed = False
         for tray_name, tray in trays.items():
             units = tray.get("units") or []
             for unit in units:
                 unit_name = unit.get("name", "<unnamed>")
+                if target_unit and unit_name != target_unit:
+                    continue
                 screws = unit.get("screws") or {}
                 manual = screws.get("manual_indices") or []
                 auto = screws.get("auto_indices") or []
@@ -614,6 +626,9 @@ class RobotManager:
                 else:
                     pose_str = "pose_index=?"
                 print(f"   • Tray '{tray_name}' unit '{unit_name}' ({pose_str}) → {', '.join(parts)}")
+                any_printed = True
+        if target_unit and not any_printed:
+            print(f"   • No screw data found for requested unit '{target_unit}'.")
         if target_location:
             loc = self.locations.get(target_location)
             if loc:
@@ -873,12 +888,16 @@ class RobotManager:
             if idx is None:
                 return
             if action == "OperatorPositionTray":
+                target_unit = named_params.get("unit")
                 target_hint = (
                     named_params.get("target_location")
                     or named_params.get("location")
                     or to_location
                 )
-                self._print_operator_guidance(target_hint)
+                self._print_operator_guidance(
+                    None if target_hint in {"unit", "units"} else target_hint,
+                    target_unit=target_unit,
+                )
             target_desc = (
                 named_params.get("location")
                 or named_params.get("target_location")
@@ -894,12 +913,16 @@ class RobotManager:
                 self._log_tray_pose(idx, action)
             http_payload = {"index": int(idx)}
 
-        elif action == "InternalScrewUnitHole":
+        elif action in ("InternalScrewUnitHole", "InternalScrew"):
             unit_name = self._get_named_param(named_params, "unit", action)
             hole = self._get_named_param(named_params, "hole", action)
             if unit_name is None or hole is None:
                 return
-            hole = int(hole)
+            try:
+                hole = int(hole)
+            except (TypeError, ValueError):
+                print(f"❌ Action '{action}' hole parameter must be an integer (got {hole!r}).")
+                return
             unit_entry = self.unit_lookup.get(unit_name)
             if not unit_entry:
                 print(f"❌ Unknown unit '{unit_name}' referenced in InternalScrew.")
@@ -916,31 +939,23 @@ class RobotManager:
                     if tray_index is None:
                         response_data = {"success": False, "error": "missing_pose_index"}
                     else:
-                        # Auto-position the tray if it isn't already aligned to this unit.
+                        # Do not auto-position here; assume the user already aligned the tray (or will do it explicitly).
                         if self.current_tray_step != tray_index:
                             print(
-                                f"↪️ Auto PositionTray: aligning tray step {tray_index} for unit '{unit_name}'."
+                                f"ℹ️ Tray is currently aligned to step {self.current_tray_step}, "
+                                f"but unit '{unit_name}' uses step {tray_index}. "
+                                f"Run PositionTray first if alignment is required."
                             )
-                            auto_resp = self.http_client.execute_action(
-                                "PositionTray", {"index": int(tray_index)}
-                            )
-                            print(f"Response for auto PositionTray: {auto_resp}")
-                            if not auto_resp.get("success", True):
-                                response_data = {
-                                    "success": False,
-                                    "error": "position_failed",
-                                    "detail": auto_resp,
-                                }
-                            else:
-                                self.current_tray_step = tray_index
-                        if not response_data or response_data.get("success", True):
-                            self._log_tray_pose(tray_index, f"InternalScrew({unit_name})")
-                            print(f"🧷 InternalScrew unit '{unit_name}' → tray_index {tray_index}, hole {hole}")
-                            print(f"📡 [HTTP] InternalScrew unit={unit_name} hole={hole}")
-                            http_action = "InternalScrew"
-                            http_payload = {"index": int(tray_index), "screw_num": int(hole)}
+                        self._log_tray_pose(tray_index, f"InternalScrew({unit_name})")
+                        print(f"🧷 InternalScrew unit '{unit_name}' → tray_index {tray_index}, hole {hole}")
+                        print(f"📡 [HTTP] InternalScrew unit={unit_name} hole={hole}")
+                        http_action = "InternalScrew"
+                        http_payload = {"index": int(tray_index), "screw_num": int(hole)}
 
         if http_payload is None:
+            if response_data:
+                print(f"Response for '{action}': {response_data}")
+                return
             print(f"❌ Action '{action}' is not supported by the simulation HTTP bridge.")
             return
 

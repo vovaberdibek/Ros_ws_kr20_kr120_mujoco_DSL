@@ -20,14 +20,34 @@ Trays:
         units:[
             { name: MTQ12, pose_name: TrayStepPose_0,
               screws: {
-                manual_indices: [80,81,84,85,88,90,92,93],
-                auto_indices:   [82,83,86,87,89,91,94,95]
+                manual_indices: [80,81,84,85],
+                auto_indices:   [82,83,86,87]
               }
             },
-            { name: MTQ3_MAG, pose_name: TrayStepPose_1 },
-            { name: CMG2, pose_name: TrayStepPose_2 },
-            { name: CMG1, pose_name: TrayStepPose_4 },
-            { name: CMG34, pose_name: TrayStepPose_6 }
+            { name: MTQ3_MAG, pose_name: TrayStepPose_1,
+              screws: {
+                manual_indices: [88,90,92,93],
+                auto_indices:   [89,91,94,95]
+              }
+            },
+            { name: CMG2, pose_name: TrayStepPose_2,
+              screws: {
+                manual_indices: [20,27,33],
+                auto_indices:   [21,22,23,24,25,26,28,29,31,32,34,35,36,37,38,39]
+              }
+            },
+            { name: CMG1, pose_name: TrayStepPose_4,
+              screws: {
+                manual_indices: [3,10,17],
+                auto_indices:   [0,1,2,4,5,6,7,8,9,11,12,13,14,15,16,18,19]
+              } 
+            },
+            { name: CMG34, pose_name: TrayStepPose_6,
+              screws: {
+                manual_indices: [40,41,42,47,53,59,63,69,70,71,77],
+                auto_indices:   [64,65,66,67,68,43,44,45,46,48,49,50,51,52,54,55,56,57,58,60,61,62,72,73,74,75,76,78,79]
+              } 
+            },
             ]
         screws: [96 x M4]
         height: 0.25
@@ -105,9 +125,9 @@ TrayStepPoses: [
 Assembly:
     AMR1 addTray: tray_AOCS to AssemblyArea ToConfirm;
     Robot1 pickTray: from PickStation ToConfirm;
-    HumanOP1 operatorPositionTray: to OperatorStation ToConfirm;
+    HumanOP1 operatorPositionTray: to OperatorStation unit MTQ12 ToConfirm;
     Robot1 positionTray: unit MTQ12 ToConfirm;
     Robot1 rechargeSequence: unit MTQ12 ToConfirm;
-    Robot1 internalScrewingSequence: unit MTQ12 ToConfirm;
+    Robot1 internalScrewingSequence: unit CMG2 ToConfirm;
     Robot1 internalScrew: unit MTQ12 hole 82 ToConfirm;
     Robot1 placeTray: to AssemblyArea ToConfirm;

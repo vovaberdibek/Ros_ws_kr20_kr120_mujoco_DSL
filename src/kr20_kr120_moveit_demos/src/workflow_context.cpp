@@ -42,6 +42,9 @@ WorkflowContext makeWorkflowContext(
   ctx.operator_steps.assign(req.operator_steps.begin(), req.operator_steps.end());
   ctx.rotation_steps.assign(req.rotation_steps.begin(), req.rotation_steps.end());
   ctx.new_tray_steps.assign(req.new_tray_steps.begin(), req.new_tray_steps.end());
+  ctx.tray_unit_names.assign(req.tray_unit_names.begin(), req.tray_unit_names.end());
+  ctx.tray_unit_pose_indices.assign(req.tray_unit_pose_indices.begin(),
+                                    req.tray_unit_pose_indices.end());
 
   return ctx;
 }

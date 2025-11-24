@@ -19,6 +19,7 @@
 #include <custom_interfaces/srv/pick_tray.hpp>
 #include <custom_interfaces/srv/place_tray.hpp>
 #include <custom_interfaces/srv/position_tray.hpp>
+#include <custom_interfaces/srv/operator_position_tray.hpp>
 #include <custom_interfaces/srv/internal_screwing_sequence.hpp>
 #include <custom_interfaces/srv/internal_screw_by_num.hpp>
 #include <custom_interfaces/action/execute_action.hpp>
@@ -227,6 +228,7 @@ class CoordinatorNode : public rclcpp::Node {
   using PickTray = custom_interfaces::srv::PickTray;
   using PlaceTray = custom_interfaces::srv::PlaceTray;
   using PositionTray = custom_interfaces::srv::PositionTray;
+  using OperatorPositionTray = custom_interfaces::srv::OperatorPositionTray;
   using InternalScrewingSequence = custom_interfaces::srv::InternalScrewingSequence;
   using InternalScrewByNum = custom_interfaces::srv::InternalScrewByNum;
   using ExecuteAction = custom_interfaces::action::ExecuteAction;
@@ -345,6 +347,14 @@ private:
       std::shared_ptr<InitParameters::Response> response) {
     try {
       context_ = kr120::coord::makeWorkflowContext(*request);
+      unit_pose_lookup_.clear();
+      if (context_) {
+        const auto &names = context_->tray_unit_names;
+        const auto &indices = context_->tray_unit_pose_indices;
+        for (std::size_t i = 0; i < names.size() && i < indices.size(); ++i) {
+          unit_pose_lookup_[names[i]] = indices[i];
+        }
+      }
       if (context_->tray_step_poses.size() > screw_sequences_.size()) {
         RCLCPP_WARN(
             get_logger(),
@@ -432,6 +442,29 @@ private:
       RCLCPP_WARN(get_logger(), "Internal screwing sequence failed for index %d.",
                   request->index);
     }
+  }
+
+  void handleOperatorPositionTray(
+      const std::shared_ptr<OperatorPositionTray::Request> request,
+      std::shared_ptr<OperatorPositionTray::Response> response) {
+    if (!ensureReady("operator_position_tray", response)) {
+      response->message = "System not ready";
+      return;
+    }
+
+    if (request->index < 0 ||
+        static_cast<std::size_t>(request->index) >= context_->tray_step_poses.size()) {
+      response->success = false;
+      response->message = "Tray index out of range";
+      RCLCPP_ERROR(get_logger(),
+                   "OperatorPositionTray rejected: tray index %d invalid.",
+                   request->index);
+      return;
+    }
+
+    bool ok = moveToTrayPose(static_cast<std::size_t>(request->index));
+    response->success = ok;
+    response->message = ok ? "Operator tray positioned" : "Failed to reach operator tray pose";
   }
 
   bool performPickSequence() {
@@ -654,6 +687,24 @@ private:
     }
   }
 
+  bool resolveUnitIndex(const ParamMap &params, int &index, std::string &message) const {
+    if (parseIntParam(params, "index", index)) {
+      return true;
+    }
+    auto unit_it = params.find("unit");
+    if (unit_it == params.end()) {
+      message = "Parameter 'unit' or 'index' is required.";
+      return false;
+    }
+    auto lookup_it = unit_pose_lookup_.find(unit_it->second);
+    if (lookup_it == unit_pose_lookup_.end()) {
+      message = "Unknown unit '" + unit_it->second + "'.";
+      return false;
+    }
+    index = lookup_it->second;
+    return true;
+  }
+
   void executeActionGoal(
       const std::shared_ptr<GoalHandleExecuteAction> goal_handle) {
     const auto goal = goal_handle->get_goal();
@@ -674,6 +725,8 @@ private:
       success = executePlaceTrayAction(params, message);
     } else if (action == "PositionTray") {
       success = executePositionTrayAction(params, message);
+    } else if (action == "OperatorPositionTray") {
+      success = executeOperatorPositionTrayAction(params, message);
     } else if (action == "InternalScrewingSequence") {
       success = executeInternalSequenceAction(params, message);
     } else if (action == "InternalScrew" || action == "InternalScrewUnitHole") {
@@ -739,10 +792,23 @@ private:
     return resp->success;
   }
 
-  bool executeInternalSequenceAction(const ParamMap &params, std::string &message) {
+  bool executeOperatorPositionTrayAction(const ParamMap &params, std::string &message) {
     int index = 0;
     if (!parseIntParam(params, "index", index)) {
-      message = "Parameter 'index' is required for InternalScrewingSequence.";
+      message = "Parameter 'index' is required for OperatorPositionTray.";
+      return false;
+    }
+    auto req = std::make_shared<OperatorPositionTray::Request>();
+    auto resp = std::make_shared<OperatorPositionTray::Response>();
+    req->index = index;
+    handleOperatorPositionTray(req, resp);
+    message = resp->success ? "Operator position complete." : "Operator positioning failed.";
+    return resp->success;
+  }
+
+  bool executeInternalSequenceAction(const ParamMap &params, std::string &message) {
+    int index = 0;
+    if (!resolveUnitIndex(params, index, message)) {
       return false;
     }
     auto req = std::make_shared<InternalScrewingSequence::Request>();
@@ -756,8 +822,7 @@ private:
   bool executeInternalScrewAction(const ParamMap &params, std::string &message) {
     int index = 0;
     int screw = 0;
-    if (!parseIntParam(params, "index", index)) {
-      message = "Parameter 'index' is required for InternalScrew.";
+    if (!resolveUnitIndex(params, index, message)) {
       return false;
     }
     if (!parseIntParam(params, "screw_num", screw) &&
@@ -787,6 +852,7 @@ private:
   rclcpp::Service<InternalScrewingSequence>::SharedPtr screw_srv_;
   rclcpp::Service<InternalScrewByNum>::SharedPtr screw_single_srv_;
   rclcpp_action::Server<ExecuteAction>::SharedPtr execute_action_server_;
+  std::unordered_map<std::string, int> unit_pose_lookup_;
 
   rclcpp::TimerBase::SharedPtr init_timer_;
   bool move_groups_ready_{false};

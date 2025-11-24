@@ -10,7 +10,7 @@ from .dsl_models import DSLValidationError
 ACTION_PARAM_ORDER = {
     "AddTray": ["tray", "object"],
     "PickTray": ["location"],
-    "OperatorPositionTray": ["location"],
+    "OperatorPositionTray": ["location", "unit"],
     "PositionTray": ["unit"],
     "RechargeSequence": ["unit"],
     "InternalScrewingSequence": ["unit"],
@@ -63,7 +63,6 @@ class DSLParser:
         self.trays: Dict[str, Dict[str, Any]] = {}
         self.locations: Dict[str, Dict[str, List[float]]] = {}
         self.tray_step_poses: List[List[float]] = []
-        self.tray_step_pose_names: List[Optional[str]] = []
         self.tray_step_pose_names: List[Optional[str]] = []
         self.main_poses: Dict[str, List[float]] = {}
         self.named_poses: Dict[str, List[float]] = {}
@@ -293,24 +292,14 @@ class DSLParser:
                 raise DSLValidationError(
                     [f"Action '{action}' does not accept positional parameters. Provide explicit keys like 'param value'."]
                 )
-            key_index = 0
-            for value in positional_values:
-                # Advance to the next key that does not already have a value
-                key = None
-                while key_index < len(ordered_keys):
-                    candidate = ordered_keys[key_index]
-                    key_index += 1
-                    if candidate not in params:
-                        key = candidate
-                        break
-                if key is None:
-                    raise DSLValidationError(
-                        [
-                            f"Action '{action}' accepts at most {len(ordered_keys)} positional parameter(s); "
-                            f"no slot available for extra value '{value}'."
-                        ]
-                    )
+            available_keys = [k for k in ordered_keys if k not in params]
+            for value, key in zip(positional_values, available_keys):
                 params[key] = value
+            if len(positional_values) > len(available_keys):
+                extra = positional_values[len(available_keys):]
+                print(
+                    f"⚠️ Ignoring {len(extra)} extra positional parameter(s) for action '{action}': {extra}"
+                )
 
         task = {
             "robot": robot,

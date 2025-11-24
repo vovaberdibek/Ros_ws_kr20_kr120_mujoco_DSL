@@ -2,6 +2,7 @@
 
 #include <array>
 #include <vector>
+#include <string>
 
 #include <geometry_msgs/msg/pose.hpp>
 
@@ -33,6 +34,8 @@ struct WorkflowContext {
   std::vector<int> operator_steps;
   std::vector<int> rotation_steps;
   std::vector<int> new_tray_steps;
+  std::vector<std::string> tray_unit_names;
+  std::vector<int> tray_unit_pose_indices;
 };
 
 WorkflowContext makeWorkflowContext(
